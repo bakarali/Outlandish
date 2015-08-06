@@ -48,22 +48,34 @@ class dbConnection //create a class for make connection
         }
          echo "Database selected..";
     }
-    function insertInto($sql){
+    function insertInto(){
       # code...
+    //  $data =  getUrlSlug::insertInto();
+    //  $data1 =  SendCurrentLocation::insertInto();
+     //echo $data1;
+  //  echo $this->myconn;
+  //mysql_query($data,$this->myconn);
+  //  mysql_query($data1,$this->myconn);
 
-                if (!mysql_query($sql)){
-                    echo "Insertion error";;
 
-                 }
-                else{
-                    echo "One row added ";
-                     // closing the connection
-                }
+
 
     }
+    function select(){
+      # code...
+    //  $data =  getUrlSlug::insertInto();
+      $data =  getInvteeCurrentLocation::select();
+     echo $data;
+     echo "<br />";
+    //echo $this->myconn;
+  //mysql_query($data,$this->myconn);
+     $sql1 = mysql_query($data,$this->myconn);
+     echo $sql1;
+  }
 
     function closeConnection() // close the connection
     {
+
         mysql_close($this->myconn);
 
         echo "Connection closed";
@@ -77,7 +89,11 @@ $connection = new dbConnection(); //i created a new object
     echo "<br />"; // putting a html break
 
     $connection->selectDatabase();// closed connection
-
+    echo "<br />";
+//    $connection->insertInto();
+  $connection->insertInto();
+    echo "<br />";
+    $connection->select();
     echo "<br />";
 
     $connection->closeConnection();
