@@ -1,13 +1,16 @@
 package com.techhunger.com.outlandish;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -17,11 +20,27 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.techhunger.com.outlandish.commonclasses.ServiceHandler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
 
 public class MapsMasterActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private  static final int ZOOM = 1;
+    private  static final int ZOOM = 15;
+    private static final String urlDomain = "192.168.1.8";
+    private static final String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc=2.2322&end_loc=null&uid=25";
+
+    String currentLoc = null;
+
+
+    LocationManager mLocationManager;
+    private ProgressDialog pDialog;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +59,7 @@ public class MapsMasterActivity extends FragmentActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-                        sendIntent.setData(Uri.parse("sms:"));
-                        sendIntent.putExtra("sms_body", "Hello");
-                        startActivity(sendIntent);
+                        new GetUserStartLocation().execute();
                     }
                 }
         );
@@ -96,7 +112,8 @@ public class MapsMasterActivity extends FragmentActivity {
 
         Criteria criteria = new Criteria();
         String provider = locationManager.getBestProvider(criteria, true);
-        Location myLocation = locationManager.getLastKnownLocation(provider);
+       // Location myLocation = locationManager.getLastKnownLocation(provider);
+        Location myLocation = getLastKnownLocation();
 
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -117,5 +134,87 @@ public class MapsMasterActivity extends FragmentActivity {
                 .tilt(30)                   // Sets the tilt of the camera to 30 degrees
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+
+    private Location getLastKnownLocation() {
+        mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
+    }
+
+
+
+    /**
+     * Async task class to get json by making HTTP call
+     * */
+    private class GetUserStartLocation extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(MapsMasterActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            // Creating service handler class instance
+            ServiceHandler sh = new ServiceHandler();
+
+            // Making a request to url and getting response
+
+
+            String jsonStr = sh.makeServiceCall(url_user_start_loc, ServiceHandler.GET);
+
+            Log.d("Response: ", "> " + jsonStr);
+
+            if (jsonStr != null) {
+                try{
+                JSONObject jobj = new JSONObject(jsonStr);
+                JSONObject responseObj = jobj.getJSONObject("response");
+                //JSONObject currentLo = responseObj.getJSONObject("url_code");
+                currentLoc  =  responseObj.getString("url_code");
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            } else {
+                Log.e("ServiceHandler", "Couldn't get any data from the url");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            /**
+             * Updating parsed JSON data into ListView
+             * */
+
+            Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                        sendIntent.setData(Uri.parse("sms:"));
+                      sendIntent.putExtra("sms_body", currentLoc);
+            startActivity(sendIntent);
+        }
+
     }
 }

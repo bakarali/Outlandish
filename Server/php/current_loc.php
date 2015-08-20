@@ -6,7 +6,7 @@ class Current_loc {
 	public function send_current_loc() {
 		$conn = new dbConnection ();
 		
-		$_GET ['url_code'] = "abcurl";
+		//$_GET ['url_code'] = "abcurl";
 		$sql = "INSERT INTO CURRENT_LOC VALUES('cl_id','" . $_GET ['current_loc'] . "','" . $_GET ['url_code'] . "');"; // remove usl id while INSERT also delete column from database
 		                                                                                                                // remove hardcode for url code , get it from url
 		
