@@ -4,21 +4,37 @@ include('dbConnection.php');
  *
  */
  $conn = new dbConnection();
- $sql = null;
-class SendCurrentLocation{
+ //$sql = null;
+class CurrentLocation{
 
-  public function insertInto(){
-
+  public function SendCurrentLocation(){
+    $conn = new dbConnection();
+            $conn->connectToDatabase();
+            echo "<br />";
+            $conn->selectDatabase();
+            echo "<br />";
 
     $sql = "INSERT INTO SendCurrentLocation VALUES ('".$_GET['scl_id']."','".$_GET['currentlat']."','".$_GET['currentlng']."','".$_GET['url_id']."');";
-    //echo $sql;
-    return $sql;
+    $chkinst = mysql_query($sql);
+
+  if(! $chkinst )
+  {
+  die('Could not enter data: ' . mysql_error());
+  echo "<br />";
+  $conn->closeConnection();
+  }else {
+  echo "New record inserted successfully";
+  echo "<br />";
+  $conn->closeConnection();
+
+  }
+
 
   }
 
 }
 
-$insert = new SendCurrentLocation();
-//$insert->insertInto($sql);
+$get = new CurrentLocation();
+$get->SendCurrentLocation();
 
  ?>
