@@ -5,8 +5,8 @@ include ('dbConnection.php');
 class User {
 	public function register() {
 		$conn = new dbConnection ();
-		
-		$sql = "INSERT INTO USER_INFO VALUES ('uid','" . $_GET ['name'] . "','" . $_GET ['email_id'] . "','" . $_GET ['password'] . "','" . $_GET ['mobile_number'] . "');";
+		$date = date('m/d/Y h:i:s a', time());
+		$sql = "INSERT INTO USER_INFO VALUES ('uid','" . $_GET ['name'] . "','" . $_GET ['email_id'] . "','" . $_GET ['password'] . "','" . $_GET ['mobile_number'] . "','$date');";
 		// $sql = "INSERT INTO GetURLSlug VALUES (50,'dd','dd','dd')";
 		
 		$result = mysqli_query ( $conn->connectToDatabase (), $sql );

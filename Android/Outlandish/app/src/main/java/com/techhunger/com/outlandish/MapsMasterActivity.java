@@ -9,10 +9,12 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,11 +36,16 @@ public class MapsMasterActivity extends FragmentActivity {
     private static final String urlDomain = "192.168.1.8";
     private static final String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc=2.2322&end_loc=null&uid=25";
 
+
     String currentLoc = null;
+     Handler handler = new Handler();
+    Runnable runnable =null;
 
 
     LocationManager mLocationManager;
     private ProgressDialog pDialog;
+
+    private static final int START_AFTER_SECONDS = 20;
 
 
 
@@ -59,10 +66,33 @@ public class MapsMasterActivity extends FragmentActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        new GetUserStartLocation().execute();
+                        // new GetUserStartLocation().execute();
+                        //    startService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
+                        //   stopService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
+
+                        callAsynchronousTask();
                     }
                 }
         );
+
+        Button stop = (Button) findViewById(R.id.stop);
+        stop.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // new GetUserStartLocation().execute();
+                        //    startService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
+                        //   stopService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
+
+                        if (runnable != null) {
+                            handler.removeCallbacks(runnable);
+                            handler.removeCallbacksAndMessages(null);
+                        }
+                    }
+                }
+        );
+
+
     }
 
 
@@ -70,6 +100,40 @@ public class MapsMasterActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+    }
+
+
+    public void callAsynchronousTask() {
+
+
+
+         runnable = new Runnable() {
+
+            @Override
+            public void run() {
+                try{
+                    //do your code here
+
+                    new UpdateCurrentLocation().execute();
+
+
+
+                    //also call the same runnable
+                    handler.postDelayed(this, 10000);
+
+                }
+                catch (Exception e) {
+                    // TODO: handle exception
+                    System.out.println(e);
+                }
+                finally{
+                    //also call the same runnable
+                  //  handler.postDelayed(this, 10000);
+                }
+            }
+        };
+        handler.postDelayed(runnable, 0);
+
     }
 
     /**
@@ -217,4 +281,67 @@ public class MapsMasterActivity extends FragmentActivity {
         }
 
     }
+
+
+    private class UpdateCurrentLocation extends AsyncTask<Void, Void, Void> {
+
+        JSONObject jobj = null;
+        String responseStr = null;
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+
+            Location myLocation = getLastKnownLocation();
+
+
+
+
+            double latitude = myLocation.getLatitude();
+            double longitude = myLocation.getLongitude();
+            String finalLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
+
+            // Creating service handler class instance
+            ServiceHandler sh = new ServiceHandler();
+
+            // Making a request to url and getting response
+
+            String url_current_start_loc =  "http://"+urlDomain+"/current_loc.php?action=send_current_loc&current_loc="+finalLoc+"&url_code=abcurl";
+
+            String jsonStr = sh.makeServiceCall(url_current_start_loc, ServiceHandler.GET);
+
+            Log.d("Response: ", "> " + jsonStr);
+
+            if (jsonStr != null) {
+                try{
+                     jobj = new JSONObject(jsonStr);
+                     responseStr = jobj.getString("status");
+
+
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            } else {
+                Log.e("ServiceHandler", "Couldn't get any data from the url");
+            }
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if(responseStr.equals("OK")){
+
+                Toast.makeText(MapsMasterActivity.this, "Saved", Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(MapsMasterActivity.this, "Not Saved", Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+    }
+
+
+
 }

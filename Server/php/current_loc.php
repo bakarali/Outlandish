@@ -5,9 +5,9 @@ include ('dbConnection.php');
 class Current_loc {
 	public function send_current_loc() {
 		$conn = new dbConnection ();
-		
+		$date = date('m/d/Y h:i:s a', time());
 		//$_GET ['url_code'] = "abcurl";
-		$sql = "INSERT INTO CURRENT_LOC VALUES('cl_id','" . $_GET ['current_loc'] . "','" . $_GET ['url_code'] . "');"; // remove usl id while INSERT also delete column from database
+		$sql = "INSERT INTO CURRENT_LOC VALUES('cl_id','" . $_GET ['current_loc'] . "','" . $_GET ['url_code'] . "','$date');"; // remove usl id while INSERT also delete column from database
 		                                                                                                                // remove hardcode for url code , get it from url
 		
 		$result = mysqli_query ( $conn->connectToDatabase (), $sql );
@@ -35,7 +35,7 @@ class Current_loc {
 			echo '{"status":"ERROR","message":"Sorry"}';
 			$conn->closeConnection ();
 		} else {
-			
+			$json = array();
 			// echo '{"status":"OK","message":"success"}';
 			
 			if (mysqli_num_rows ( $result ) > 0) {
@@ -52,7 +52,7 @@ class Current_loc {
 				);
 			}
 			//echo $json;
-			echo json_encode ( $json );
+			echo json_encode($json);
 			// $conn->closeConnection ();
 		}
 	}

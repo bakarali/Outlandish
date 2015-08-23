@@ -11,11 +11,14 @@ $conn = new dbConnection();
 
 
       //  $conn->selectDatabase();
-        //$_GET['url_code']="abcurl";
-    $sql = "INSERT INTO USER_START_LOC VALUES ('usl_id','".$_GET['start_loc']."','".$_GET['end_loc']."','".$_GET['url_code']."','".$_GET['uid']."');";
+       $url_code="abcurl";
+       $date = date('m/d/Y h:i:s a', time());
+    $sql = "INSERT INTO USER_START_LOC VALUES ('usl_id','".$_GET['start_loc']."','".$_GET['end_loc']."','$url_code','".$_GET['uid']."','$date');";
     //$sql = "INSERT INTO GetURLSlug VALUES (50,'dd','dd','dd')";
+    //echo $sql;
 
     $result = mysqli_query($conn->connectToDatabase(),$sql);
+    var_dump($result);
 
 if(!$result )
 {
