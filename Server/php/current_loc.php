@@ -15,12 +15,13 @@ class Current_loc {
 		if (! $result) {
 			// die('Could not enter data: ' . mysql_error());
 			echo '{"status":"ERROR","message":"Sorry"}';
-			$conn->closeConnection ();
+			
 		} else {
 			
 			echo '{"status":"OK","message":"success"}';
-			$conn->closeConnection ();
+			
 		}
+		$conn->closeConnection();
 	}
 	public function get_current_loc() {
 		$conn = new dbConnection ();
@@ -33,7 +34,7 @@ class Current_loc {
 		if (! $result) {
 			// die ( 'Could not enter data: ' . mysql_error () );
 			echo '{"status":"ERROR","message":"Sorry"}';
-			$conn->closeConnection ();
+		
 		} else {
 			$json = array();
 			// echo '{"status":"OK","message":"success"}';
@@ -55,6 +56,8 @@ class Current_loc {
 			echo json_encode($json);
 			// $conn->closeConnection ();
 		}
+		
+		$conn->closeConnection();
 	}
 }
 

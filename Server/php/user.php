@@ -9,16 +9,17 @@ class User {
 		$sql = "INSERT INTO USER_INFO VALUES ('uid','" . $_GET ['name'] . "','" . $_GET ['email_id'] . "','" . $_GET ['password'] . "','" . $_GET ['mobile_number'] . "','$date');";
 		// $sql = "INSERT INTO GetURLSlug VALUES (50,'dd','dd','dd')";
 		
-		$result = mysqli_query ( $conn->connectToDatabase (), $sql );
+		$result = mysqli_query ( $conn->connectToDatabase(), $sql );
 		
 		if (! $result) {
 			die ( 'Could not enter data: ' . mysql_error () );
 			echo '{"status":"ERROR","message":"Sorry"}';
-			$conn->closeConnection ();
+			
 		} else {
 			echo '{"status":"OK","message":"New record inserted"}';
-			$conn->closeConnection ();
+			
 		}
+		$conn->closeConnection();
 	}
 	public function login() {
 		
@@ -44,6 +45,7 @@ class User {
 				echo '{"status":"ERROR","message":"Sorry"}';
 			}
 		}
+		$conn->closeConnection();
 	}
 }
 $set = new User ();

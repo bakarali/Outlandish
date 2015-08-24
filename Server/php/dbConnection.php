@@ -17,6 +17,14 @@ class dbConnection // create a class for make connection
 		
 		return $this->myconn;
 	}
+	
+	
+	function closeConnection() // close the connection
+	{
+	
+		mysqli_close($this->myconn);
+	}
+	
 }
 
 /*
@@ -56,12 +64,6 @@ class dbConnection // create a class for make connection
 // echo json_encode($sql);
 // }
 
-// / function closeConnection() // close the connection
-// {
-
-// mysql_close($this->myconn);
-
-// }
 
 // }
 // $connection = new dbConnection(); //i created a new object

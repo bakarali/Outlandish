@@ -36,11 +36,10 @@ echo '{"status":"ERROR","message":"Sorry"}';
 echo json_encode($json);
 
   //echo '{"status":"OK","message":"success","response":{"url_code":"http://www.url_code.com"}}';
-//$conn->closeConnection();
 
 }
 
-
+$conn->closeConnection();
   }
 
 }

@@ -33,6 +33,7 @@ public class MapsMasterActivity extends FragmentActivity {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private  static final int ZOOM = 15;
     private static final String urlDomain = "192.168.1.8";
+    //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
     private static final String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc=2.2322&end_loc=null&uid=25";
 
 
