@@ -12,15 +12,21 @@
     android:name="com.google.android.gms.maps.SupportMapFragment" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnshare"
         android:layout_width="342dp"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="share" />
 
     <Button
-        android:id="@+id/stop"
+        android:id="@+id/btnstop" android:visibility="invisible"
         android:layout_width="342dp"
         android:layout_height="wrap_content"
         android:text="Stop" />
+
+    <Button
+        android:id="@+id/btnreshare" android:visibility="invisible"
+        android:layout_width="342dp"
+        android:layout_height="wrap_content"
+        android:text="Reshare" />
 
 </LinearLayout>

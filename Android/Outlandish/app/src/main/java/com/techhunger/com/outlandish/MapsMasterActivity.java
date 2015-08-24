@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,9 +36,14 @@ public class MapsMasterActivity extends FragmentActivity {
     private static final String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc=2.2322&end_loc=null&uid=25";
 
 
-    String currentLoc = null;
+    String url_code = null;
      Handler handler = new Handler();
     Runnable runnable =null;
+
+    Button btnstop = null;
+    Button btnshare = null;
+
+    Button btnreshare = null;
 
 
     LocationManager mLocationManager;
@@ -48,7 +52,7 @@ public class MapsMasterActivity extends FragmentActivity {
     private static final int START_AFTER_SECONDS = 20;
 
 
-
+    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,22 +65,9 @@ public class MapsMasterActivity extends FragmentActivity {
     }
     public void onClickButtonListener(){
 
-        Button button2 = (Button) findViewById(R.id.button);
-        button2.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // new GetUserStartLocation().execute();
-                        //    startService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
-                        //   stopService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
+        btnstop = (Button) findViewById(R.id.btnstop);
 
-                        callAsynchronousTask();
-                    }
-                }
-        );
-
-        Button stop = (Button) findViewById(R.id.stop);
-        stop.setOnClickListener(
+        btnstop.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -92,8 +83,55 @@ public class MapsMasterActivity extends FragmentActivity {
                 }
         );
 
+        btnshare = (Button) findViewById(R.id.btnshare);
+        btnshare.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(v.equals(btnstop))
+                        {
+                            btnstop.setVisibility(View.INVISIBLE);
+                        }
+                         new GetUserStartLocation().execute();
+                        //    startService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
+                        //   stopService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
 
-    }
+
+
+                        //  callAsynchronousTask();
+                    }
+                }
+        );
+
+        btnreshare = (Button) findViewById(R.id.btnreshare);
+        btnreshare.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                }
+        );
+
+
+
+
+
+}
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+
+            }
+                //  The Intents Fairy has delivered us some data!
+//                String contents = intent.getStringExtra("SCAN_RESULT");
+//                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+                // Handle successful scan
+            Toast.makeText(MapsMasterActivity.this, "share success", Toast.LENGTH_LONG).show();
+            } else if (resultCode == RESULT_CANCELED) {
+                // Handle cancel
+            }
+        }
 
 
     @Override
@@ -253,7 +291,7 @@ public class MapsMasterActivity extends FragmentActivity {
                 JSONObject jobj = new JSONObject(jsonStr);
                 JSONObject responseObj = jobj.getJSONObject("response");
                 //JSONObject currentLo = responseObj.getJSONObject("url_code");
-                currentLoc  =  responseObj.getString("url_code");
+                url_code  =  responseObj.getString("url_code");
                 }catch (JSONException e){
                     e.printStackTrace();
                 }
@@ -274,10 +312,54 @@ public class MapsMasterActivity extends FragmentActivity {
              * Updating parsed JSON data into ListView
              * */
 
-            Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-                        sendIntent.setData(Uri.parse("sms:"));
-                      sendIntent.putExtra("sms_body", currentLoc);
-            startActivity(sendIntent);
+            callAsynchronousTask();
+
+            btnstop = (Button) findViewById(R.id.btnstop);
+            btnreshare = (Button) findViewById(R.id.btnreshare);
+            btnshare = (Button) findViewById((R.id.btnshare));
+            if (btnstop.getVisibility() == View.INVISIBLE && btnreshare.getVisibility() == View.INVISIBLE) {
+                // Either gone or invisible
+                btnstop.setVisibility(View.VISIBLE);
+                btnreshare.setVisibility(View.VISIBLE);
+            }
+
+            if (btnshare.getVisibility() == View.VISIBLE) {
+                // Either gone or invisible
+                btnshare.setVisibility(View.INVISIBLE);
+            }
+
+
+
+
+            if(url_code != null) {
+                sharingIntent.setType("text/plain");
+                String shareBody = "Check you friend location status here"+url_code;
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Outlandish Share Location");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                startActivityForResult(sharingIntent, 0);
+            }else{
+                Toast.makeText(MapsMasterActivity.this, "Please click on share location again.", Toast.LENGTH_LONG).show();
+            }
+
+            //show stop button
+
+
+
+
+
+//            Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+//                        sendIntent.setData(Uri.parse("sms:"));
+//                      sendIntent.putExtra("sms_body", currentLoc);
+//            startActivity(sendIntent);
+//            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+//            sharingIntent.setType("text/plain");
+//            String shareBody = "Here is the share content body";
+//            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+//            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+//            startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+
         }
 
     }
@@ -333,9 +415,9 @@ public class MapsMasterActivity extends FragmentActivity {
             super.onPostExecute(result);
             if(responseStr.equals("OK")){
 
-                Toast.makeText(MapsMasterActivity.this, "Saved", Toast.LENGTH_LONG).show();
+               // Toast.makeText(MapsMasterActivity.this, "Saved", Toast.LENGTH_LONG).show();
             }else{
-                Toast.makeText(MapsMasterActivity.this, "Not Saved", Toast.LENGTH_LONG).show();
+              //  Toast.makeText(MapsMasterActivity.this, "Not Saved", Toast.LENGTH_LONG).show();
             }
 
         }
