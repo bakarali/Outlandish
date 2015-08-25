@@ -3,6 +3,7 @@ package com.techhunger.com.outlandish;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -34,10 +35,12 @@ public class MapsMasterActivity extends FragmentActivity {
     private  static final int ZOOM = 15;
     private static final String urlDomain = "192.168.1.8";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
-    private static final String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc=2.2322&end_loc=null&uid=25";
+
 
 
     String url_code = null;
+    String uid = null;
+    String name = null;
      Handler handler = new Handler();
     Runnable runnable =null;
 
@@ -49,6 +52,7 @@ public class MapsMasterActivity extends FragmentActivity {
 
     LocationManager mLocationManager;
     private ProgressDialog pDialog;
+    public static final String PREFS_NAME = "UserData";
 
     private static final int START_AFTER_SECONDS = 20;
 
@@ -61,6 +65,9 @@ public class MapsMasterActivity extends FragmentActivity {
         setUpMapIfNeeded();
         mMap.setMyLocationEnabled(true);
 
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+         uid = prefs.getString("uid", null);
+         name = prefs.getString("name", null);
 
         onClickButtonListener();
     }
@@ -72,14 +79,14 @@ public class MapsMasterActivity extends FragmentActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // new GetUserStartLocation().execute();
-                        //    startService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
-                        //   stopService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
+
 
                         if (runnable != null) {
                             handler.removeCallbacks(runnable);
                             handler.removeCallbacksAndMessages(null);
+
                         }
+
                     }
                 }
         );
@@ -89,17 +96,15 @@ public class MapsMasterActivity extends FragmentActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(v.equals(btnstop))
-                        {
-                            btnstop.setVisibility(View.INVISIBLE);
+                        if (uid != null) {
+                            new GetUserStartLocation().execute();
+                        } else {
+                            Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
+                            startActivity(intent);
+
                         }
-                         new GetUserStartLocation().execute();
-                        //    startService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
-                        //   stopService(new Intent(MapsMasterActivity.this, SendCurrentLoc.class));
 
 
-
-                        //  callAsynchronousTask();
                     }
                 }
         );
@@ -111,6 +116,7 @@ public class MapsMasterActivity extends FragmentActivity {
                     public void onClick(View v) {
 
                     }
+
                 }
         );
 
@@ -119,20 +125,7 @@ public class MapsMasterActivity extends FragmentActivity {
 
 
 }
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == 0) {
-            if (resultCode == RESULT_OK) {
 
-            }
-                //  The Intents Fairy has delivered us some data!
-//                String contents = intent.getStringExtra("SCAN_RESULT");
-//                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
-                // Handle successful scan
-            Toast.makeText(MapsMasterActivity.this, "share success", Toast.LENGTH_LONG).show();
-            } else if (resultCode == RESULT_CANCELED) {
-                // Handle cancel
-            }
-        }
 
 
     @Override
@@ -282,6 +275,13 @@ public class MapsMasterActivity extends FragmentActivity {
 
             // Making a request to url and getting response
 
+            Location myLocation = getLastKnownLocation();
+            double latitude = myLocation.getLatitude();
+            double longitude = myLocation.getLongitude();
+            String finalLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
+
+
+            String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc=null&uid="+uid;
 
             String jsonStr = sh.makeServiceCall(url_user_start_loc, ServiceHandler.GET);
 

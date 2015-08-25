@@ -1,32 +1,50 @@
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center">
-
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="0dp"  android:layout_weight="1" android:id="@+id/map"
+    android:layout_height="450dp"  android:layout_weight="1" android:id="@+id/map"
     tools:context="com.techhunger.com.outlandish.MapsMasterActivity"
-    android:name="com.google.android.gms.maps.SupportMapFragment" />
+    android:name="com.google.android.gms.maps.SupportMapFragment"
+    ></fragment>
+
 
     <Button
         android:id="@+id/btnshare"
-        android:layout_width="342dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="share" />
-
-    <Button
-        android:id="@+id/btnstop" android:visibility="invisible"
-        android:layout_width="342dp"
-        android:layout_height="wrap_content"
-        android:text="Stop" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:text="share"
+        android:layout_alignTop="@+id/btnstop" />
 
     <Button
         android:id="@+id/btnreshare" android:visibility="invisible"
-        android:layout_width="342dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="25dp "
+        android:layout_alignParentBottom="true"
         android:text="Reshare" />
 
+    <Button
+        android:id="@+id/btnstop" android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="Stop"
+        android:layout_below="@+id/map"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>
 </LinearLayout>
