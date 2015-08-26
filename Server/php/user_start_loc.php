@@ -15,8 +15,8 @@ $conn = new dbConnection();
        $current_time = time();
        $date = date('m/d/Y h:i:s a', $current_time);
        $og_url_code = $current_time."UID".$_GET['uid'];
-      
-    $sql = "INSERT INTO USER_START_LOC VALUES ('usl_id','".$_GET['start_loc']."','".$_GET['end_loc']."','md5($og_url_code)','".$_GET['uid']."','$date','$og_url_code');";
+      $url_code_md5 = md5($og_url_code);
+    $sql = "INSERT INTO USER_START_LOC VALUES ('usl_id','".$_GET['start_loc']."','".$_GET['end_loc']."','$url_code_md5','".$_GET['uid']."','$date','$og_url_code');";
     //$sql = "INSERT INTO GetURLSlug VALUES (50,'dd','dd','dd')";
     //echo $sql;
 
