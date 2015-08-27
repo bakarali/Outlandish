@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -24,7 +25,8 @@ public class LoginActivity extends AppCompatActivity {
 
     String uid = null;
     String name = null;
-    private static final String urlDomain = "192.168.1.8";
+   // private static final String urlDomain = "192.168.1.8";
+   private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
     // private static final String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc=2.2322&end_loc=null&uid=25";
     private ProgressDialog pDialog;
@@ -35,6 +37,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
 
         EditText inputMobileNoET = (EditText) findViewById(R.id.phone_no);
         EditText inputPasswordET =(EditText) findViewById(R.id.password);
@@ -113,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... arg0) {
 
-            String url_user_login =  "http://"+urlDomain+"/user.php?action=login&mobile_number="+inputMobileNo+"&password="+inputPassword;
+            String url_user_login =  urlDomain+"/user.php?action=login&mobile_number="+inputMobileNo+"&password="+inputPassword;
 
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();
@@ -174,7 +178,7 @@ public class LoginActivity extends AppCompatActivity {
             else
 
             {
-                Toast.makeText(LoginActivity.this, "Please try again.", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, "Please register.", Toast.LENGTH_LONG).show();
             }
         }
 

@@ -33,7 +33,8 @@ public class MapsMasterActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private  static final int ZOOM = 15;
-    private static final String urlDomain = "192.168.1.8";
+        //private static final String urlDomain = "192.168.1.8";
+        private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
 
 
@@ -62,6 +63,7 @@ public class MapsMasterActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_master);
+
         setUpMapIfNeeded();
         mMap.setMyLocationEnabled(true);
 
@@ -114,7 +116,18 @@ public class MapsMasterActivity extends FragmentActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (uid != null) {
+                            new GetUserStartLocation().execute();
 
+
+
+
+
+                        } else {
+                            Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
+                            startActivity(intent);
+
+                        }
                     }
 
                 }
@@ -281,7 +294,7 @@ public class MapsMasterActivity extends FragmentActivity {
             String finalLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
 
 
-            String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc=null&uid="+uid;
+            String url_user_start_loc =  urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc=null&uid="+uid;
 
             String jsonStr = sh.makeServiceCall(url_user_start_loc, ServiceHandler.GET);
 
@@ -318,7 +331,18 @@ public class MapsMasterActivity extends FragmentActivity {
             btnstop = (Button) findViewById(R.id.btnstop);
             btnreshare = (Button) findViewById(R.id.btnreshare);
             btnshare = (Button) findViewById((R.id.btnshare));
+            if(url_code != null) {
+                sharingIntent.setType("text/plain");
+                String shareBody = "Check you friend location status here "+urlDomain+"/current_loc.php?action=getLocation&url_code="+url_code;
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Outlandish Share Location");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                startActivityForResult(sharingIntent, 0);
+            }else{
+                Toast.makeText(MapsMasterActivity.this, "Please click on share location again.", Toast.LENGTH_LONG).show();
+            }
             if (btnstop.getVisibility() == View.INVISIBLE && btnreshare.getVisibility() == View.INVISIBLE) {
+
                 // Either gone or invisible
                 btnstop.setVisibility(View.VISIBLE);
                 btnreshare.setVisibility(View.VISIBLE);
@@ -332,16 +356,16 @@ public class MapsMasterActivity extends FragmentActivity {
 
 
 
-            if(url_code != null) {
-                sharingIntent.setType("text/plain");
-                String shareBody = "Check you friend location status here"+url_code;
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Outlandish Share Location");
-                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-                startActivity(Intent.createChooser(sharingIntent, "Share via"));
-                startActivityForResult(sharingIntent, 0);
-            }else{
-                Toast.makeText(MapsMasterActivity.this, "Please click on share location again.", Toast.LENGTH_LONG).show();
-            }
+//            if(url_code != null) {
+//                sharingIntent.setType("text/plain");
+//                String shareBody = "Check you friend location status here"+url_code;
+//                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Outlandish Share Location");
+//                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+//                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+//                startActivityForResult(sharingIntent, 0);
+//            }else{
+//                Toast.makeText(MapsMasterActivity.this, "Please click on share location again.", Toast.LENGTH_LONG).show();
+//            }
 
             //show stop button
 
@@ -388,7 +412,7 @@ public class MapsMasterActivity extends FragmentActivity {
 
             // Making a request to url and getting response
 
-            String url_current_start_loc =  "http://"+urlDomain+"/current_loc.php?action=send_current_loc&current_loc="+finalLoc+"&url_code=abcurl";
+            String url_current_start_loc =  urlDomain+"/current_loc.php?action=send_current_loc&current_loc="+finalLoc+"&url_code="+url_code;
 
             String jsonStr = sh.makeServiceCall(url_current_start_loc, ServiceHandler.GET);
 

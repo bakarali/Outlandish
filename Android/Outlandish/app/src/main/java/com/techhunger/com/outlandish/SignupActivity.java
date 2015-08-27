@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -24,7 +25,8 @@ public class SignupActivity extends AppCompatActivity {
 
 
     String uid = null;
-    private static final String urlDomain = "192.168.1.8";
+   // private static final String urlDomain = "192.168.1.8";
+   private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
     // private static final String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc=2.2322&end_loc=null&uid=25";
     private ProgressDialog pDialog;
@@ -43,6 +45,8 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
         EditText inputNameET = (EditText) findViewById(R.id.name);
         EditText inputMobileNoET =(EditText) findViewById(R.id.phone_no);
         EditText inputEmailIdET = (EditText)findViewById(R.id.emailid);
@@ -140,7 +144,7 @@ public class SignupActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... arg0) {
 
-        String url_user_signup =  "http://"+urlDomain+"/user.php?action=signup&name="+inputName+"&email_id="+inputEmailId+"&password="+inputPassword+"&mobile_number="+inputMobileNo+"";
+        String url_user_signup =  urlDomain+"/user.php?action=signup&name="+inputName+"&email_id="+inputEmailId+"&password="+inputPassword+"&mobile_number="+inputMobileNo+"";
 
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();

@@ -6,15 +6,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center">
-    <!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--xmlns:tools="http://schemas.android.com/tools"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:orientation="vertical"-->
-        <!--android:gravity="center">-->
+
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="fill_parent"  android:layout_weight="1" android:id="@+id/map"
+    android:layout_height="match_parent"  android:layout_weight="1" android:id="@+id/map"
     tools:context="com.techhunger.com.outlandish.MapsMasterActivity"
     android:name="com.google.android.gms.maps.SupportMapFragment"
     ></fragment>
@@ -30,7 +25,9 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:text="share"
-        />
+        android:background="#4DB6AC"
+        android:textSize="25dp"
+        android:textColor="#E3F2FD" />
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent" android:orientation="vertical">
@@ -38,14 +35,17 @@
         android:id="@+id/btnreshare" android:visibility="invisible"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
-        android:text="Reshare" />
+        android:text="Reshare"
+        android:background="#009688"
+        android:textColor="#E3F2FD" />
 
     <Button
         android:id="@+id/btnstop" android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text="Stop"
-        />
+        android:background="#F44336"
+        android:textColor="#E3F2FD" />
 </LinearLayout>
 
 </RelativeLayout>
