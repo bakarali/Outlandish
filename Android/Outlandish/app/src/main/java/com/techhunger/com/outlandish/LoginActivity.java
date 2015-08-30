@@ -25,8 +25,8 @@ public class LoginActivity extends AppCompatActivity {
 
     String uid = null;
     String name = null;
-   // private static final String urlDomain = "192.168.1.8";
-   private static final String urlDomain = "http://www.techhunger.com";
+   //private static final String urlDomain = "192.168.1.8";
+  private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
     // private static final String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc=2.2322&end_loc=null&uid=25";
     private ProgressDialog pDialog;
@@ -40,8 +40,8 @@ public class LoginActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-        EditText inputMobileNoET = (EditText) findViewById(R.id.phone_no);
-        EditText inputPasswordET =(EditText) findViewById(R.id.password);
+        final EditText inputMobileNoET = (EditText) findViewById(R.id.phone_no);
+        final EditText inputPasswordET =(EditText) findViewById(R.id.password);
 
         TextView linktosignup = (TextView) findViewById(R.id.signtxt);
         linktosignup.setOnClickListener(
@@ -60,9 +60,15 @@ public class LoginActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        String inputMobileNo = inputMobileNoET.getText().toString();
+                        String inputPwd = inputPasswordET.getText().toString();
+                        if (inputMobileNo.matches("")||inputPwd.matches("")) {
+                            Toast.makeText(LoginActivity.this, "Enter phone no. and password", Toast.LENGTH_LONG).show();
+                        } else {
                         new dologin().execute();
-//
+}
                     }
+
                 }
         );
     }

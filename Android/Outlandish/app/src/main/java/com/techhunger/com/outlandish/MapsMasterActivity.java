@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,8 +35,8 @@ public class MapsMasterActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private  static final int ZOOM = 15;
-        //private static final String urlDomain = "192.168.1.8";
-        private static final String urlDomain = "http://www.techhunger.com";
+      // private static final String urlDomain = "192.168.1.8";
+      private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
 
 
@@ -63,15 +65,26 @@ public class MapsMasterActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_master);
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
 
-        setUpMapIfNeeded();
-        mMap.setMyLocationEnabled(true);
+        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+            setUpMapIfNeeded();
+            mMap.setMyLocationEnabled(true);
 
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-         uid = prefs.getString("uid", null);
-         name = prefs.getString("name", null);
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            uid = prefs.getString("uid", null);
+            name = prefs.getString("name", null);
 
-        onClickButtonListener();
+            onClickButtonListener();
+
+        }else {
+            //popup box
+            Toast.makeText(MapsMasterActivity.this, "Please check your internet connection.", Toast.LENGTH_LONG).show();
+
+
+        }
+
     }
     public void onClickButtonListener(){
 
@@ -98,14 +111,22 @@ public class MapsMasterActivity extends FragmentActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (uid != null) {
-                            new GetUserStartLocation().execute();
-                        } else {
-                            Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
-                            startActivity(intent);
+
+                       ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+                        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+                            if (uid != null) {
+                                new GetUserStartLocation().execute();
+                            } else {
+                                Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
+                                startActivity(intent);
+                            }
+                        }else {
+                            //popup box
+                            Toast.makeText(MapsMasterActivity.this, "Please check your internet connection.", Toast.LENGTH_LONG).show();
+
 
                         }
-
 
                     }
                 }
@@ -116,19 +137,20 @@ public class MapsMasterActivity extends FragmentActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (uid != null) {
-                            new GetUserStartLocation().execute();
 
+                            if (uid != null) {
+                                new GetUserStartLocation().execute();
 
+                            } else {
+                                Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
+                                startActivity(intent);
 
+                            }
 
-
-                        } else {
-                            Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
-                            startActivity(intent);
 
                         }
-                    }
+
+
 
                 }
         );

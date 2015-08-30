@@ -9,10 +9,13 @@
 
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"  android:layout_weight="1" android:id="@+id/map"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:id="@+id/map"
     tools:context="com.techhunger.com.outlandish.MapsMasterActivity"
     android:name="com.google.android.gms.maps.SupportMapFragment"
     ></fragment>
+
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"

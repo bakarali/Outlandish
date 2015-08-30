@@ -21,11 +21,14 @@ import com.techhunger.com.outlandish.commonclasses.ServiceHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class SignupActivity extends AppCompatActivity {
 
 
     String uid = null;
-   // private static final String urlDomain = "192.168.1.8";
+  //  private static final String urlDomain = "192.168.1.8";
    private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
     // private static final String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc=2.2322&end_loc=null&uid=25";
@@ -47,9 +50,9 @@ public class SignupActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
-        EditText inputNameET = (EditText) findViewById(R.id.name);
-        EditText inputMobileNoET =(EditText) findViewById(R.id.phone_no);
-        EditText inputEmailIdET = (EditText)findViewById(R.id.emailid);
+        final EditText inputNameET = (EditText) findViewById(R.id.name);
+        final EditText inputMobileNoET =(EditText) findViewById(R.id.phone_no);
+        final EditText inputEmailIdET = (EditText)findViewById(R.id.emailid);
         final EditText inputPasswordET = (EditText)findViewById(R.id.password);
         final EditText inputConfirmPasswordET = (EditText)findViewById(R.id.confirmpassword);
 
@@ -72,19 +75,24 @@ public class SignupActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        String inputName = inputNameET.getText().toString();
+                        String inputMobileNo = inputMobileNoET.getText().toString();
+                        String inputEmailid = inputEmailIdET.getText().toString();
                         String inputPwd = inputPasswordET.getText().toString();
                         String inputConfPwd = inputConfirmPasswordET.getText().toString();
-
-                        if (inputPwd.equals(inputConfPwd)) {
-                           // password and confirm passwords equal.go to next step
-                        new doSignup().execute();
+                        if (inputName.matches("")||inputMobileNo.matches("")||inputEmailid.matches("")||inputPwd.matches("")||inputConfPwd.matches("")) {
+                            Toast.makeText(SignupActivity.this, "all field mandatory ", Toast.LENGTH_LONG).show();
                         } else {
-                            //passwords not matching.please try again
-                            Toast.makeText(SignupActivity.this, "Password doesn't match ", Toast.LENGTH_LONG).show();
+                            if (inputPwd.equals(inputConfPwd)) {
+                                // password and confirm passwords equal.go to next step
+                                new doSignup().execute();
+                            } else {
+                                //passwords not matching.please try again
+                                Toast.makeText(SignupActivity.this, "Password doesn't match ", Toast.LENGTH_LONG).show();
+
+                            }
 
                         }
-
-//
                     }
                 }
         );
@@ -144,7 +152,12 @@ public class SignupActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... arg0) {
 
-        String url_user_signup =  urlDomain+"/user.php?action=signup&name="+inputName+"&email_id="+inputEmailId+"&password="+inputPassword+"&mobile_number="+inputMobileNo+"";
+            String url_user_signup = null;
+            try {
+                url_user_signup = urlDomain+"/user.php?action=signup&name="+ URLEncoder.encode(inputName, "utf-8")+"&email_id="+inputEmailId+"&password="+inputPassword+"&mobile_number="+URLEncoder.encode(inputMobileNo, "utf-8")+"";
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
 
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler();

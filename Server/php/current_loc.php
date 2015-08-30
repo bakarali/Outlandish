@@ -24,9 +24,12 @@ class Current_loc {
 	public function get_current_loc() {
 		$conn = new dbConnection ();
 		
-		$get_current_loc_sql = "SELECT current_loc FROM CURRENT_LOC WHERE url_code = '" . $_GET ['url_code'] . "';";
+		 $get_current_loc_sql = "SELECT current_loc FROM CURRENT_LOC WHERE url_code = '" . $_GET ['url_code'] . "' order by clid desc limit 1;";
+
+		
+		
 		// $sql = 'SELECT * FROM CURRENT_LOC WHERE url_code =' .$_GET ['url_code'].';';
-		$user_start_loc_sql = "SELECT start_loc FROM USER_START_LOC WHERE url_code = '" . $_GET ['url_code'] . "';";
+		
 		
 		$result = mysqli_query ( $conn->connectToDatabase (), $get_current_loc_sql );
 		
@@ -65,15 +68,15 @@ class Current_loc {
 		$uid;
 		$name;
 		
-		 $user_start_loc_sql = "SELECT start_loc,uid FROM USER_START_LOC WHERE url_code = '". $_GET['url_code']."'";
+		$user_start_loc_sql = "SELECT start_loc,uid FROM USER_START_LOC WHERE url_code = '". $_GET['url_code']."' LIMIT 1";
 		
 		$start_result = mysqli_query ( $conn->connectToDatabase (), $user_start_loc_sql );
 		$current_location;
 		
-	
+
 			
 			
-			if (mysqli_num_rows ($start_result) > 0) {
+			if (mysqli_num_rows($start_result) > 0) {
 				// $r = mysql_fetch_assoc ( $result );
 				$r = mysqli_fetch_assoc ($start_result);
 				$current_location = $r['start_loc'];
@@ -127,7 +130,7 @@ class Current_loc {
 // locate you.
  var map;
 //var url = "http://192.168.1.8/current_loc.php?action=get_current_loc&url_code='.$_GET['url_code'].'";
- var url = "http://techhunger.com/current_loc.php?action=get_current_loc&url_code='.$_GET['url_code'].'";
+ var url = "http://www.techhunger.com/current_loc.php?action=get_current_loc&url_code='.$_GET['url_code'].'";
   var infoWindow;
 				
 function initMap() {
@@ -163,8 +166,8 @@ function cUpdateLocation(){
 					var lat1 ;
 					var lng1 ;
 					 $.ajax({
-				//type:"GET",
-                    url: "http://localhost/current_loc.php?action=get_current_loc&url_code=abcurl",
+					type:"GET",
+                    url: url,
                     //force to handle it as text
                     dataType: "json",
                     success: function(data) {
