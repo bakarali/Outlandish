@@ -71,7 +71,23 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
         );
+        Button btngotosignup = (Button) findViewById(R.id.gotosignup);
+        btngotosignup.setOnClickListener(
+
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+                        Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+                        startActivity(intent);
+
+//
+                    }
+                }
+        );
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

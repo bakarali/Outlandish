@@ -1,7 +1,9 @@
 package com.techhunger.com.outlandish;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Criteria;
@@ -12,7 +14,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +33,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class MapsMasterActivity extends FragmentActivity {
+public class MapsMasterActivity extends AppCompatActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private  static final int ZOOM = 15;
@@ -99,6 +101,11 @@ public class MapsMasterActivity extends FragmentActivity {
                         if (runnable != null) {
                             handler.removeCallbacks(runnable);
                             handler.removeCallbacksAndMessages(null);
+                            btnstop.setVisibility(View.INVISIBLE);
+                            btnreshare.setVisibility(View.INVISIBLE);
+                            btnshare.setVisibility(View.VISIBLE);
+                            Toast.makeText(MapsMasterActivity.this, "update location stopped.", Toast.LENGTH_LONG).show();
+
 
                         }
 
@@ -138,18 +145,17 @@ public class MapsMasterActivity extends FragmentActivity {
                     @Override
                     public void onClick(View v) {
 
-                            if (uid != null) {
-                                new GetUserStartLocation().execute();
+                        if (uid != null) {
+                            new GetUserStartLocation().execute();
 
-                            } else {
-                                Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
-                                startActivity(intent);
-
-                            }
-
+                        } else {
+                            Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
+                            startActivity(intent);
 
                         }
 
+
+                    }
 
 
                 }
@@ -161,7 +167,31 @@ public class MapsMasterActivity extends FragmentActivity {
 
 }
 
+    @Override
+    public void onBackPressed() {
+         createDialog();
 
+    }
+    private void createDialog(){
+        AlertDialog.Builder alertDlg = new AlertDialog.Builder(MapsMasterActivity.this);
+        alertDlg.setMessage("Are sure want to exit?");
+        alertDlg.setCancelable(true);
+
+        alertDlg.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                MapsMasterActivity.super.onBackPressed();
+                Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+                homeIntent.addCategory( Intent.CATEGORY_HOME );
+                homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(homeIntent);
+            }
+        });
+
+
+        alertDlg.create().show();
+
+    }
 
     @Override
     protected void onResume() {

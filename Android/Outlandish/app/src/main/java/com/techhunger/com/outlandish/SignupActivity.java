@@ -93,9 +93,29 @@ public class SignupActivity extends AppCompatActivity {
                             }
 
                         }
+
+
+
+//
                     }
                 }
         );
+        Button btngotologin = (Button) findViewById(R.id.gotologin);
+        btngotologin.setOnClickListener(
+
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+                        Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                        startActivity(intent);
+
+//
+                    }
+                }
+        );
+
 
     }
 
@@ -131,8 +151,10 @@ public class SignupActivity extends AppCompatActivity {
 
 
         String inputName = inputNameET.getText().toString();
+
         String inputMobileNo = inputMobileNoET.getText().toString();
         String inputEmailId = inputEmailIdET.getText().toString();
+
         String inputPassword = inputPasswordET.getText().toString();
 
 

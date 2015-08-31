@@ -16,7 +16,6 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     ></fragment>
 
-
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
@@ -28,7 +27,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:text="share"
-        android:background="#4DB6AC"
+        android:background="#4CAF50"
         android:textSize="25dp"
         android:textColor="#E3F2FD" />
 <LinearLayout
@@ -39,7 +38,7 @@
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:text="Reshare"
-        android:background="#009688"
+        android:background="#4CAF50"
         android:textColor="#E3F2FD" />
 
     <Button
@@ -52,4 +51,5 @@
 </LinearLayout>
 
 </RelativeLayout>
+
 </LinearLayout>
