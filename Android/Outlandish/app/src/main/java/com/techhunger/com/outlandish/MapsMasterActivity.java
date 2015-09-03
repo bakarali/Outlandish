@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -87,7 +89,39 @@ public class MapsMasterActivity extends AppCompatActivity {
 
         }
 
+
+
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_mapmaster, menu);
+        return true;
+
+
+    }
+
+    public void logOut(){
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit().clear().apply();
+        Intent intent = new Intent(MapsMasterActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_logout:
+                logOut();
+
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void onClickButtonListener(){
 
         btnstop = (Button) findViewById(R.id.btnstop);
@@ -127,6 +161,7 @@ public class MapsMasterActivity extends AppCompatActivity {
                             } else {
                                 Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
                                 startActivity(intent);
+                                finish();
                             }
                         }else {
                             //popup box
@@ -151,7 +186,7 @@ public class MapsMasterActivity extends AppCompatActivity {
                         } else {
                             Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
                             startActivity(intent);
-
+                            finish();
                         }
 
 
@@ -216,7 +251,7 @@ public class MapsMasterActivity extends AppCompatActivity {
 
 
                     //also call the same runnable
-                    handler.postDelayed(this, 10000);
+                    handler.postDelayed(this, 15000);
 
                 }
                 catch (Exception e) {

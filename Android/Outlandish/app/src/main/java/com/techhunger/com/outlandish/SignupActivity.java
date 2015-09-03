@@ -64,6 +64,7 @@ public class SignupActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                         startActivity(intent);
+                        finish();
 //
                     }
                 }
@@ -110,6 +111,7 @@ public class SignupActivity extends AppCompatActivity {
 
                         Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                         startActivity(intent);
+                        finish();
 
 //
                     }
@@ -233,6 +235,7 @@ public class SignupActivity extends AppCompatActivity {
                // Toast.makeText(SignupActivity.this, "Sign up success", Toast.LENGTH_LONG).show();
                 Intent mapMasterIntent =  new Intent(SignupActivity.this, MapsMasterActivity.class);
                 startActivity(mapMasterIntent);
+                finish();
 
             }
 

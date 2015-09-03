@@ -6,7 +6,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.techhunger.com.outlandish.LoginActivity"
     android:theme="@style/AppTheme"
-    android:background="#424242">
+    android:background="#fafafa">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
@@ -19,10 +19,11 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:background="#424242">
+        android:background="#fafafa"
+        >
 
         <Space
-            android:layout_width="321dp"
+            android:layout_width="match_parent"
             android:layout_height="143dp"
             android:layout_gravity="center_horizontal" />
 
@@ -34,9 +35,9 @@
             android:id="@+id/phone_no"
             android:layout_gravity="center_horizontal"
             android:hint="Phone no."
-            android:textColor="#FAFAFA"
-            android:textColorHint="#FAFAFA"
-            android:backgroundTint="#FAFAFA" />
+            android:textColor="#424242"
+            android:textColorHint="#424242"
+            android:backgroundTint="#424242" />
 
 
         <EditText
@@ -47,9 +48,9 @@
             android:id="@+id/password"
             android:layout_gravity="center_horizontal"
             android:hint="Password"
-            android:textColorHint="#FAFAFA"
-            android:textColor="#FAFAFA"
-            android:backgroundTint="#FAFAFA" />
+            android:textColorHint="#424242"
+            android:textColor="#424242"
+            android:backgroundTint="#424242" />
 
 
         <Button
@@ -72,7 +73,7 @@
             android:text="Don't have an account?"
             android:id="@+id/textView"
             android:layout_gravity="center_horizontal"
-            android:textColor="#FAFAFA" />
+            android:textColor="#424242" />
 
         <TextView
             android:layout_width="wrap_content"

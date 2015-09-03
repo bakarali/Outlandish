@@ -50,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
                         startActivity(intent);
+                        finish();
 //
                     }
                 }
@@ -81,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
                         startActivity(intent);
+                        finish();
 
 //
                     }
@@ -95,6 +97,8 @@ public class LoginActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -151,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
 
             Log.d("Response: ", "> " + jsonStr);
 
-            if (jsonStr != null) {
+                if (jsonStr != null) {
                 try {
                     JSONObject jobj = new JSONObject(jsonStr);
                     JSONObject responseObj = jobj.getJSONObject("response");
@@ -194,6 +198,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Toast.makeText(SignupActivity.this, "Sign up success", Toast.LENGTH_LONG).show();
                 Intent mapMasterIntent =  new Intent(LoginActivity.this, MapsMasterActivity.class);
                 startActivity(mapMasterIntent);
+                finish();
 
             }
 
