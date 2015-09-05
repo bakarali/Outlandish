@@ -60,6 +60,7 @@ public class MapsMasterActivity extends AppCompatActivity {
     LocationManager mLocationManager;
     private ProgressDialog pDialog;
     public static final String PREFS_NAME = "UserData";
+    public static final String LOC_PREFS = "LocationData";
 
     private static final int START_AFTER_SECONDS = 20;
 
@@ -69,12 +70,15 @@ public class MapsMasterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_master);
+      //  android.support.v7.app.ActionBar actionBar =  getSupportActionBar();
+        //actionBar.setDisplayShowHomeEnabled(true);
+       // actionBar.setIcon(R.mipmap.ic_launcher4);
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
 
         if (netInfo != null && netInfo.isConnectedOrConnecting()) {
-            setUpMapIfNeeded();
-            mMap.setMyLocationEnabled(true);
+                setUpMapIfNeeded();
+                mMap.setMyLocationEnabled(true);
 
             SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
             uid = prefs.getString("uid", null);
@@ -181,7 +185,21 @@ public class MapsMasterActivity extends AppCompatActivity {
                     public void onClick(View v) {
 
                         if (uid != null) {
-                            new GetUserStartLocation().execute();
+                            SharedPreferences prefs = getSharedPreferences(LOC_PREFS, MODE_PRIVATE);
+                            url_code = prefs.getString("url_code_from_sp", null);
+                            if(url_code!=null){
+                                sharingIntent.setType("text/plain");
+                                String shareBody = "Check you friend location status here "+urlDomain+"/current_loc.php?action=getLocation&url_code="+url_code;
+                                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "PlotMe Share Location");
+                                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                                startActivityForResult(sharingIntent, 0);
+
+                            }else{
+                                new GetUserStartLocation().execute();
+                            }
+
+
 
                         } else {
                             Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
@@ -217,7 +235,7 @@ public class MapsMasterActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 MapsMasterActivity.super.onBackPressed();
                 Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-                homeIntent.addCategory( Intent.CATEGORY_HOME );
+                homeIntent.addCategory(Intent.CATEGORY_HOME);
                 homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(homeIntent);
             }
@@ -232,6 +250,11 @@ public class MapsMasterActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+        // Check if we were successful in obtaining the map.
+        mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            setUpMap();
+        }
     }
 
 
@@ -290,7 +313,7 @@ public class MapsMasterActivity extends AppCompatActivity {
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
             // Check if we were successful in obtaining the map.
-            if (mMap != null) {
+            if (mMap != null && isGPSEnable()) {
                 setUpMap();
             }
         }
@@ -303,54 +326,86 @@ public class MapsMasterActivity extends AppCompatActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
-        Criteria criteria = new Criteria();
-        String provider = locationManager.getBestProvider(criteria, true);
-       // Location myLocation = locationManager.getLastKnownLocation(provider);
-        Location myLocation = getLastKnownLocation();
+            Criteria criteria = new Criteria();
+            String provider = mLocationManager.getBestProvider(criteria, true);
+            // Location myLocation = locationManager.getLastKnownLocation(provider);
+            Location myLocation = getLastKnownLocation();
 
+            if (myLocation != null) {
+                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                double latitude = myLocation.getLatitude();
+                double longitude = myLocation.getLongitude();
 
-        double latitude = myLocation.getLatitude();
-        double longitude = myLocation.getLongitude();
+                LatLng latLng = new LatLng(latitude, longitude);
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
-        LatLng latLng = new LatLng(latitude, longitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                LatLng myCoordinates = new LatLng(latitude, longitude);
+                CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(myCoordinates, 12);
+                mMap.animateCamera(yourLocation);
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(myCoordinates)      // Sets the center of the map to LatLng (refer to previous snippet)
+                        .zoom(ZOOM)                   // Sets the zoom
+                        .bearing(90)                // Sets the orientation of the camera to east
+                        .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                        .build();                   // Creates a CameraPosition from the builder
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
 
-        LatLng myCoordinates = new LatLng(latitude, longitude);
-        CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(myCoordinates, 12);
-        mMap.animateCamera(yourLocation);
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(myCoordinates)      // Sets the center of the map to LatLng (refer to previous snippet)
-                .zoom(ZOOM)                   // Sets the zoom
-                .bearing(90)                // Sets the orientation of the camera to east
-                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
+
+
+
 
 
     private Location getLastKnownLocation() {
         mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
-        List<String> providers = mLocationManager.getProviders(true);
-        Location bestLocation = null;
-        for (String provider : providers) {
-            Location l = mLocationManager.getLastKnownLocation(provider);
-            if (l == null) {
-                continue;
+            List<String> providers = mLocationManager.getProviders(true);
+            Location bestLocation = null;
+            for (String provider : providers) {
+                Location l = mLocationManager.getLastKnownLocation(provider);
+                if (l == null) {
+                    continue;
+                }
+                if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                    // Found best last known location: %s", l);
+                    bestLocation = l;
+                }
             }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                // Found best last known location: %s", l);
-                bestLocation = l;
-            }
-        }
-        return bestLocation;
+            return bestLocation;
     }
 
+    private boolean isGPSEnable() {
+        mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            return true;
+        }else{
+            showGPSDisabledAlertToUser();
+            return false;
+        }
+    }
 
+    private void showGPSDisabledAlertToUser(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
 
     /**
      * Async task class to get json by making HTTP call
@@ -383,22 +438,23 @@ public class MapsMasterActivity extends AppCompatActivity {
 
             String url_user_start_loc =  urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc=null&uid="+uid;
 
-            String jsonStr = sh.makeServiceCall(url_user_start_loc, ServiceHandler.GET);
+                String jsonStr = sh.makeServiceCall(url_user_start_loc, ServiceHandler.GET);
 
-            Log.d("Response: ", "> " + jsonStr);
+                Log.d("Response: ", "> " + jsonStr);
 
-            if (jsonStr != null) {
-                try{
-                JSONObject jobj = new JSONObject(jsonStr);
-                JSONObject responseObj = jobj.getJSONObject("response");
-                //JSONObject currentLo = responseObj.getJSONObject("url_code");
-                url_code  =  responseObj.getString("url_code");
-                }catch (JSONException e){
-                    e.printStackTrace();
+                if (jsonStr != null) {
+                    try{
+                        JSONObject jobj = new JSONObject(jsonStr);
+                        JSONObject responseObj = jobj.getJSONObject("response");
+                        //JSONObject currentLo = responseObj.getJSONObject("url_code");
+                        url_code  =  responseObj.getString("url_code");
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+                } else {
+                    Log.e("ServiceHandler", "Couldn't get any data from the url");
                 }
-            } else {
-                Log.e("ServiceHandler", "Couldn't get any data from the url");
-            }
+
 
             return null;
         }
@@ -413,6 +469,15 @@ public class MapsMasterActivity extends AppCompatActivity {
              * Updating parsed JSON data into ListView
              * */
 
+            if(url_code!=null)
+
+            {
+                //storing
+                SharedPreferences.Editor editor = getSharedPreferences(LOC_PREFS, MODE_PRIVATE).edit();
+                editor.putString("url_code_from_sp", url_code);
+                editor.commit();
+            }
+
             callAsynchronousTask();
 
             btnstop = (Button) findViewById(R.id.btnstop);
@@ -421,7 +486,7 @@ public class MapsMasterActivity extends AppCompatActivity {
             if(url_code != null) {
                 sharingIntent.setType("text/plain");
                 String shareBody = "Check you friend location status here "+urlDomain+"/current_loc.php?action=getLocation&url_code="+url_code;
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Outlandish Share Location");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "PlotMe Share Location");
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
                 startActivityForResult(sharingIntent, 0);

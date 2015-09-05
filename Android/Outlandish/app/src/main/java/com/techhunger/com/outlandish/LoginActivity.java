@@ -25,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
 
     String uid = null;
     String name = null;
+    String message  = null;
    //private static final String urlDomain = "192.168.1.8";
   private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
@@ -61,8 +62,8 @@ public class LoginActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String inputMobileNo = inputMobileNoET.getText().toString();
-                        String inputPwd = inputPasswordET.getText().toString();
+                        String inputMobileNo = inputMobileNoET.getText().toString().trim();
+                        String inputPwd = inputPasswordET.getText().toString().trim();
                         if (inputMobileNo.matches("")||inputPwd.matches("")) {
                             Toast.makeText(LoginActivity.this, "Enter phone no. and password", Toast.LENGTH_LONG).show();
                         } else {
@@ -123,8 +124,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-        String inputMobileNo = inputMobileNoET.getText().toString();
-        String inputPassword = inputPasswordET.getText().toString();
+        String inputMobileNo = inputMobileNoET.getText().toString().trim();
+        String inputPassword = inputPasswordET.getText().toString().trim();
 
 
         @Override
@@ -157,11 +158,22 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (jsonStr != null) {
                 try {
+
                     JSONObject jobj = new JSONObject(jsonStr);
-                    JSONObject responseObj = jobj.getJSONObject("response");
+                    if(jobj.getString("status").equals("OK")){
+                        JSONObject responseObj = jobj.getJSONObject("response");
+                        if(responseObj.getString("uid")!=null){
+                            uid = responseObj.getString("uid");
+                            name = responseObj.getString("name");
+                        }
+                    }else{
+                        message = jobj.getString("message");
+                    }
+
+
                     //JSONObject currentLo = responseObj.getJSONObject("url_code");
-                    uid = responseObj.getString("uid");
-                    name = responseObj.getString("name");
+
+
 
 
                 } catch (JSONException e) {
@@ -205,7 +217,11 @@ public class LoginActivity extends AppCompatActivity {
             else
 
             {
-                Toast.makeText(LoginActivity.this, "Please register.", Toast.LENGTH_LONG).show();
+                if(message!=null) {
+                    Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+                }else {
+                    Toast.makeText(LoginActivity.this, "Please try again.", Toast.LENGTH_LONG).show();
+                }
             }
         }
 

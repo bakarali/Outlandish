@@ -22,10 +22,34 @@
         android:background="#fafafa"
         >
 
-        <Space
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="143dp"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.43"
+            android:weightSum="1">
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.53" />
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="PloteMe"-->
+                <!--android:id="@+id/textView2"-->
+                <!--android:layout_gravity="center_horizontal"-->
+                <!--android:layout_weight="0.12"-->
+                <!--android:textColor="#FF9800"-->
+                <!--android:textSize="@dimen/abc_action_bar_default_height_material"-->
+                <!--android:textColorLink="@color/abc_search_url_text_pressed"-->
+                <!--android:textStyle="normal|bold"-->
+                <!--android:typeface="sans"-->
+                <!--android:autoText="false" />-->
+        </LinearLayout>
 
         <EditText
             android:layout_width="match_parent"
@@ -65,7 +89,8 @@
         <Space
             android:layout_width="323dp"
             android:layout_height="126dp"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            style="@android:style/TextAppearance" />
 
         <TextView
             android:layout_width="wrap_content"

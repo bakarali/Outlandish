@@ -13,7 +13,7 @@ class dbConnection // create a class for make connection
 	var $myconn;
 	function connectToDatabase() // create a function for connect database
 {
-		$this->myconn = mysqli_connect ( "localhost", "root", "", "Outlandish" ) or die ( "Error " . mysqli_error ( $conn ) );
+		$this->myconn = mysqli_connect ( "localhost", "root", "bak11ali@#", "Outlandish" ) or die ( "Error " . mysqli_error ( $conn ) );
 		
 		return $this->myconn;
 	}

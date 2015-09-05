@@ -9,12 +9,26 @@ class User {
 		$date = date ( 'm/d/Y h:i:s a', time () );
 		// $passwordDecrypt = $_GET ['password'];
 		$passwordDecrypt = sha1 ( $_GET ['password'] );
-		$checkuser = "SELECT uid FROM USER_INFO WHERE email_id='" . $_GET ['email_id'] . "' and mobile_number='" . $_GET ['mobile_number'] . "'";
+		$checkuser = "SELECT uid FROM USER_INFO WHERE email_id='" . $_GET ['email_id'] . "' or mobile_number='" . $_GET ['mobile_number'] . "'";
 		$count = array ();
 			$result = $conn->query ( $checkuser );
 			$row = $result->fetch_assoc ();
 			if (count ( $row ) > 0) {
-				echo '{"status":"ERROR","message":" Duplicate entry"}';
+				
+// 				$response = array (
+// 						'status' => 'ERROR',
+// 						'message' => 'Already registered'
+						
+// 						);
+				$response = array (
+						'status' => 'ERROR',
+						'message' => 'Already registered'
+						
+				);
+				echo json_encode ( $response );
+
+				
+				
 			}else {
 				$signupuser = "INSERT INTO USER_INFO VALUES ('uid','" . $_GET ['name'] . "','" . $_GET ['email_id'] . "','$passwordDecrypt','" . $_GET ['mobile_number'] . "','$date');";
 				
@@ -23,7 +37,7 @@ class User {
 				$result = mysqli_query ( $conn, $signupuser );
 				$last_uid = mysqli_insert_id ( $conn );
 				$response = array ();
-				if (! $result) {
+				if (!$result) {
 						
 					echo '{"status":"ERROR","message":"Sorry"}';
 				} else {
@@ -71,7 +85,7 @@ class User {
 					echo '{"status":"ERROR","message":"Wrong credential"}';
 				}
 			} else {
-				echo '{"status":"ERROR","message":"Sorry"}';
+				echo '{"status":"ERROR","message":"Sorry, Please register first."}';
 			}
 		}
 	}

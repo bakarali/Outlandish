@@ -28,6 +28,9 @@ public class SignupActivity extends AppCompatActivity {
 
 
     String uid = null;
+    String message  = null;
+
+
   //  private static final String urlDomain = "192.168.1.8";
    private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
@@ -76,11 +79,11 @@ public class SignupActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String inputName = inputNameET.getText().toString();
-                        String inputMobileNo = inputMobileNoET.getText().toString();
-                        String inputEmailid = inputEmailIdET.getText().toString();
-                        String inputPwd = inputPasswordET.getText().toString();
-                        String inputConfPwd = inputConfirmPasswordET.getText().toString();
+                        String inputName = inputNameET.getText().toString().trim();
+                        String inputMobileNo = inputMobileNoET.getText().toString().trim();
+                        String inputEmailid = inputEmailIdET.getText().toString().trim();
+                        String inputPwd = inputPasswordET.getText().toString().trim();
+                        String inputConfPwd = inputConfirmPasswordET.getText().toString().trim();
                         if (inputName.matches("")||inputMobileNo.matches("")||inputEmailid.matches("")||inputPwd.matches("")||inputConfPwd.matches("")) {
                             Toast.makeText(SignupActivity.this, "all field mandatory ", Toast.LENGTH_LONG).show();
                         } else {
@@ -152,12 +155,12 @@ public class SignupActivity extends AppCompatActivity {
         EditText inputPasswordET = (EditText)findViewById(R.id.password);
 
 
-        String inputName = inputNameET.getText().toString();
+        String inputName = inputNameET.getText().toString().trim();
 
-        String inputMobileNo = inputMobileNoET.getText().toString();
-        String inputEmailId = inputEmailIdET.getText().toString();
+        String inputMobileNo = inputMobileNoET.getText().toString().trim();
+        String inputEmailId = inputEmailIdET.getText().toString().trim();
 
-        String inputPassword = inputPasswordET.getText().toString();
+        String inputPassword = inputPasswordET.getText().toString().trim();
 
 
         @Override
@@ -194,11 +197,23 @@ public class SignupActivity extends AppCompatActivity {
             Log.d("Response: ", "> " + jsonStr);
 
             if (jsonStr != null) {
+
                 try {
                     JSONObject jobj = new JSONObject(jsonStr);
-                    JSONObject responseObj = jobj.getJSONObject("response");
-                    //JSONObject currentLo = responseObj.getJSONObject("url_code");
-                    uid = responseObj.getString("uid");
+                    if(jobj.getString("status").equals("OK")){
+                        JSONObject responseObj = jobj.getJSONObject("response");
+                        if(responseObj.getString("uid")!=null){
+                            uid = responseObj.getString("uid");
+                        }
+                    }else{
+                         message = jobj.getString("message");
+                    }
+
+
+
+
+
+
 
 
                 } catch (JSONException e) {
@@ -221,32 +236,38 @@ public class SignupActivity extends AppCompatActivity {
              * Updating parsed JSON data into ListView
              * */
 
-            if(uid!=null)
+                if(uid!=null)
 
-            {
-                //storing
-                SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-                editor.putString("name", inputName);
-                editor.putString("uid", uid);
-                editor.commit();
+                {
+                    //storing
+                    SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+                    editor.putString("name", inputName);
+                    editor.putString("uid", uid);
+                    editor.commit();
 //                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 //                boolean silent = settings.getBoolean("silentMode", false);
 //                setSilent(silent);
-               // Toast.makeText(SignupActivity.this, "Sign up success", Toast.LENGTH_LONG).show();
-                Intent mapMasterIntent =  new Intent(SignupActivity.this, MapsMasterActivity.class);
-                startActivity(mapMasterIntent);
-                finish();
+                    // Toast.makeText(SignupActivity.this, "Sign up success", Toast.LENGTH_LONG).show();
+                    Intent mapMasterIntent =  new Intent(SignupActivity.this, MapsMasterActivity.class);
+                    startActivity(mapMasterIntent);
+                    finish();
 
+                }
+
+                else
+
+                {
+                    if(message!=null) {
+                        Toast.makeText(SignupActivity.this, message, Toast.LENGTH_LONG).show();
+                    }else {
+                        Toast.makeText(SignupActivity.this, "Please try again.", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
 
-            else
 
-            {
-                Toast.makeText(SignupActivity.this, "Please try again.", Toast.LENGTH_LONG).show();
-            }
         }
 
 
 
     }
-}
