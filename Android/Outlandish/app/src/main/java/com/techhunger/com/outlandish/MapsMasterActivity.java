@@ -19,15 +19,26 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.techhunger.com.outlandish.commonclasses.PlaceAutocompleteAdapter;
 import com.techhunger.com.outlandish.commonclasses.ServiceHandler;
 
 import org.json.JSONException;
@@ -35,7 +46,15 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class MapsMasterActivity extends AppCompatActivity {
+public class MapsMasterActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+private static final String TAG = "AutoPlace";
+protected GoogleApiClient mGoogleApiClient;
+
+private PlaceAutocompleteAdapter mAdapter;
+
+private AutoCompleteTextView mAutocompleteView;
+    private static final LatLngBounds BOUNDS_GREATER_SYDNEY = new LatLngBounds(
+            new LatLng(-34.041458, 150.790100), new LatLng(-33.682247, 151.383362));
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private  static final int ZOOM = 15;
@@ -55,6 +74,7 @@ public class MapsMasterActivity extends AppCompatActivity {
     Button btnshare = null;
 
     Button btnreshare = null;
+    String endPointLatLong = null;
 
 
     LocationManager mLocationManager;
@@ -92,8 +112,7 @@ public class MapsMasterActivity extends AppCompatActivity {
 
 
         }
-
-
+        autoPlaces();
 
     }
     @Override
@@ -187,18 +206,17 @@ public class MapsMasterActivity extends AppCompatActivity {
                         if (uid != null) {
                             SharedPreferences prefs = getSharedPreferences(LOC_PREFS, MODE_PRIVATE);
                             url_code = prefs.getString("url_code_from_sp", null);
-                            if(url_code!=null){
+                            if (url_code != null) {
                                 sharingIntent.setType("text/plain");
-                                String shareBody = "Check you friend location status here "+urlDomain+"/current_loc.php?action=getLocation&url_code="+url_code;
+                                String shareBody = "Check you friend location status here " + urlDomain + "/current_loc.php?action=getLocation&url_code=" + url_code;
                                 sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "PlotMe Share Location");
                                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
                                 startActivityForResult(sharingIntent, 0);
 
-                            }else{
+                            } else {
                                 new GetUserStartLocation().execute();
                             }
-
 
 
                         } else {
@@ -226,25 +244,111 @@ public class MapsMasterActivity extends AppCompatActivity {
 
     }
     private void createDialog(){
-        AlertDialog.Builder alertDlg = new AlertDialog.Builder(MapsMasterActivity.this);
-        alertDlg.setMessage("Are sure want to exit?");
-        alertDlg.setCancelable(true);
 
-        alertDlg.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure want to exit?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        MapsMasterActivity.super.onBackPressed();
+                        Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+                        homeIntent.addCategory(Intent.CATEGORY_HOME);
+                        homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(homeIntent);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+
+    }
+    private void autoPlaces(){
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, 0 /* clientId */, this)
+                .addApi(Places.GEO_DATA_API)
+                .build();
+
+
+
+        // Retrieve the AutoCompleteTextView that will display Place suggestions.
+        mAutocompleteView = (AutoCompleteTextView)
+                findViewById(R.id.autocomplete_places);
+
+
+        mAdapter = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
+                mGoogleApiClient, BOUNDS_GREATER_SYDNEY, null);
+        mAutocompleteView.setAdapter(mAdapter);
+
+        // Register a listener that receives callbacks when a suggestion has been selected
+        mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
+        // Set up the 'clear text' button that clears the text in the autocomplete view
+        Button clearButton = (Button) findViewById(R.id.button_clear);
+        clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                MapsMasterActivity.super.onBackPressed();
-                Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-                homeIntent.addCategory(Intent.CATEGORY_HOME);
-                homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(homeIntent);
+            public void onClick(View v) {
+                mAutocompleteView.setText("");
             }
         });
 
 
-        alertDlg.create().show();
 
     }
+
+    private AdapterView.OnItemClickListener mAutocompleteClickListener
+            = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            /*
+             Retrieve the place ID of the selected item from the Adapter.
+             The adapter stores each Place suggestion in a PlaceAutocomplete object from which we
+             read the place ID.
+              */
+            final PlaceAutocompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
+            final String placeId = String.valueOf(item.placeId);
+            Log.i(TAG, "Autocomplete item selected: " + item.description);
+
+            /*
+             Issue a request to the Places Geo Data API to retrieve a Place object with additional
+              details about the place.
+              */
+            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+                    .getPlaceById(mGoogleApiClient, placeId);
+            placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+
+            Toast.makeText(getApplicationContext(), "Clicked: " + item.description,
+                    Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "Called getPlaceById to get Place details for " + item.placeId);
+        }
+    };
+
+    /**
+     * Callback for results from a Places Geo Data API query that shows the first place result in
+     * the details view on screen.
+     */
+    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
+            = new ResultCallback<PlaceBuffer>() {
+        @Override
+        public void onResult(PlaceBuffer places) {
+            if (!places.getStatus().isSuccess()) {
+                // Request did not complete successfully
+                Log.e(TAG, "Place query did not complete. Error: " + places.getStatus().toString());
+                places.release();
+                return;
+            }
+            // Get the Place object from the buffer.
+            final Place place = places.get(0);
+
+            // Format details of the place for display and show it in a TextView.
+            endPointLatLong = place.getLatLng().toString();
+
+
+            places.release();
+        }
+    };
 
     @Override
     protected void onResume() {
@@ -377,6 +481,9 @@ public class MapsMasterActivity extends AppCompatActivity {
                 }
             }
             return bestLocation;
+
+
+      
     }
 
     private boolean isGPSEnable() {
@@ -407,6 +514,8 @@ public class MapsMasterActivity extends AppCompatActivity {
         alert.show();
     }
 
+
+
     /**
      * Async task class to get json by making HTTP call
      * */
@@ -435,8 +544,13 @@ public class MapsMasterActivity extends AppCompatActivity {
             double longitude = myLocation.getLongitude();
             String finalLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
 
+            String url_user_start_loc;
+            if(endPointLatLong !=null){
+                url_user_start_loc = urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc="+endPointLatLong+"&uid="+uid;
+            }else{
+                url_user_start_loc = urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc=null&uid="+uid;
+            }
 
-            String url_user_start_loc =  urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc=null&uid="+uid;
 
                 String jsonStr = sh.makeServiceCall(url_user_start_loc, ServiceHandler.GET);
 
@@ -598,6 +712,17 @@ public class MapsMasterActivity extends AppCompatActivity {
             }
 
         }
+
+    }
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
+                + connectionResult.getErrorCode());
+
+        // TODO(Developer): Check error code and notify the user of error state and resolution.
+        Toast.makeText(this,
+                "Could not connect to Google API Client: Error." + connectionResult.getErrorCode(),
+                Toast.LENGTH_SHORT).show();
 
     }
 

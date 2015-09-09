@@ -16,18 +16,18 @@ $conn = new dbConnection();
        $date = date('m/d/Y h:i:s a', $current_time);
        $og_url_code = $current_time."UID".$_GET['uid'];
       $url_code_md5 = md5($og_url_code);
-    $sql = "INSERT INTO USER_START_LOC VALUES ('usl_id','".$_GET['start_loc']."','".$_GET['end_loc']."','$url_code_md5','".$_GET['uid']."','$date','$og_url_code');";
-    //$sql = "INSERT INTO GetURLSlug VALUES (50,'dd','dd','dd')";
-    //echo $sql;
-
+    
+      $final_end_loc = preg_replace('@[^0-9\.\,]+@i', '',$_GET['end_loc']);
+    $sql = "INSERT INTO USER_START_LOC VALUES ('usl_id','".$_GET['start_loc']."','".$final_end_loc."','$url_code_md5','".$_GET['uid']."','$date','$og_url_code');";
+  
     $result = mysqli_query($conn->connectToDatabase(),$sql);
-    //var_dump($result);
+  
 
 if(!$result )
 {
-  //die('Could not enter data: ' . mysql_error());
+ 
 echo '{"status":"ERROR","message":"Sorry"}';
-  //$conn->closeConnection();
+
 
 
 }else {
@@ -35,7 +35,7 @@ echo '{"status":"ERROR","message":"Sorry"}';
   $json = array( 'status' => 'OK', 'message' => "success", "response" => $response );
 echo json_encode($json);
 
-  //echo '{"status":"OK","message":"success","response":{"url_code":"http://www.url_code.com"}}';
+
 
 }
 
