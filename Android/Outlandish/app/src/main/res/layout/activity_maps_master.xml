@@ -40,6 +40,7 @@
         <AutoCompleteTextView
             android:id="@+id/autocomplete_places"
             android:layout_width="match_parent"
+            android:inputType="textNoSuggestions"
             android:layout_height="wrap_content"
             android:hint="@string/autocomplete_hint" android:padding="10dp"
             android:nextFocusUp="@id/autocomplete_places"
