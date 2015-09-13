@@ -83,8 +83,8 @@
             android:text="Login"
             android:id="@+id/btnlogin"
             android:layout_gravity="center_horizontal"
-            android:textColor="#424242"
-            android:background="#FF9800" />
+            android:textColor="#FAFAFA"
+            android:background="#2196F3" />
 
         <Space
             android:layout_width="323dp"
@@ -117,7 +117,7 @@
             android:text="sign up"
             android:id="@+id/gotosignup"
             android:layout_gravity="center_horizontal"
-            android:background="#616161"
+            android:background="#757575"
             android:textColor="#FAFAFA" />
 
     </LinearLayout>

@@ -78,6 +78,8 @@ private AutoCompleteTextView mAutocompleteView;
     FloatingActionButton btnshare = null;
 
     FloatingActionButton btnreshare = null;
+    FloatingActionButton btnmylocation = null;
+
     String endPointLatLong = null;
 
 
@@ -109,6 +111,8 @@ private AutoCompleteTextView mAutocompleteView;
             name = prefs.getString("name", null);
 
             onClickButtonListener();
+            autoPlaces();
+
 
         }else {
             //popup box
@@ -116,7 +120,6 @@ private AutoCompleteTextView mAutocompleteView;
 
 
         }
-        autoPlaces();
 
 
     }
@@ -326,8 +329,7 @@ private AutoCompleteTextView mAutocompleteView;
                     .getPlaceById(mGoogleApiClient, placeId);
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
 
-            Toast.makeText(getApplicationContext(), "Clicked: " + item.description,
-                    Toast.LENGTH_SHORT).show();
+
             Log.i(TAG, "Called getPlaceById to get Place details for " + item.placeId);
         }
     };
@@ -445,7 +447,8 @@ private AutoCompleteTextView mAutocompleteView;
     private void setUpMap() {
 
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
+             mMap.getUiSettings().setMyLocationButtonEnabled(false);
+          //   mMap.setMyLocationEnabled(true);
 
             Criteria criteria = new Criteria();
             String provider = mLocationManager.getBestProvider(criteria, true);
@@ -455,8 +458,8 @@ private AutoCompleteTextView mAutocompleteView;
             if (myLocation != null) {
                 mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-                double latitude = myLocation.getLatitude();
-                double longitude = myLocation.getLongitude();
+                final double latitude = myLocation.getLatitude();
+                final double longitude = myLocation.getLongitude();
 
                 LatLng latLng = new LatLng(latitude, longitude);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -471,7 +474,24 @@ private AutoCompleteTextView mAutocompleteView;
                         .tilt(30)                   // Sets the tilt of the camera to 30 degrees
                         .build();                   // Creates a CameraPosition from the builder
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                btnmylocation = (FloatingActionButton) findViewById(R.id.btnmyLocation);
+                btnmylocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                      LatLng myCoordinates = new LatLng(latitude, longitude);
+                      CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(myCoordinates, 12);
+                      mMap.animateCamera(yourLocation);
+                      CameraPosition cameraPosition = new CameraPosition.Builder()
+                              .target(myCoordinates)      // Sets the center of the map to LatLng (refer to previous snippet)
+                              .zoom(ZOOM)                   // Sets the zoom
+                              .bearing(90)                // Sets the orientation of the camera to east
+                              .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                              .build();                   // Creates a CameraPosition from the builder
+                      mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                      btnmylocation = (FloatingActionButton) findViewById(R.id.btnmyLocation);
+                }}
 
+                );
 
 
             }
