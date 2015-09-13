@@ -14,6 +14,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -38,15 +39,18 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.techhunger.com.outlandish.commonclasses.PlaceAutocompleteAdapter;
 import com.techhunger.com.outlandish.commonclasses.ServiceHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
-public class MapsMasterActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class MapsMasterActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 private static final String TAG = "AutoPlace";
 protected GoogleApiClient mGoogleApiClient;
 
@@ -70,10 +74,10 @@ private AutoCompleteTextView mAutocompleteView;
      Handler handler = new Handler();
     Runnable runnable =null;
 
-    Button btnstop = null;
-    Button btnshare = null;
+    FloatingActionButton btnstop = null;
+    FloatingActionButton btnshare = null;
 
-    Button btnreshare = null;
+    FloatingActionButton btnreshare = null;
     String endPointLatLong = null;
 
 
@@ -81,7 +85,7 @@ private AutoCompleteTextView mAutocompleteView;
     private ProgressDialog pDialog;
     public static final String PREFS_NAME = "UserData";
     public static final String LOC_PREFS = "LocationData";
-
+    Place place;
     private static final int START_AFTER_SECONDS = 20;
 
 
@@ -113,6 +117,7 @@ private AutoCompleteTextView mAutocompleteView;
 
         }
         autoPlaces();
+
 
     }
     @Override
@@ -147,8 +152,7 @@ private AutoCompleteTextView mAutocompleteView;
 
     public void onClickButtonListener(){
 
-        btnstop = (Button) findViewById(R.id.btnstop);
-
+        btnstop = (FloatingActionButton) findViewById(R.id.btnstop);
         btnstop.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -158,8 +162,8 @@ private AutoCompleteTextView mAutocompleteView;
                         if (runnable != null) {
                             handler.removeCallbacks(runnable);
                             handler.removeCallbacksAndMessages(null);
-                            btnstop.setVisibility(View.INVISIBLE);
-                            btnreshare.setVisibility(View.INVISIBLE);
+                            btnstop.setVisibility(View.GONE);
+                            btnreshare.setVisibility(View.GONE);
                             btnshare.setVisibility(View.VISIBLE);
                             Toast.makeText(MapsMasterActivity.this, "update location stopped.", Toast.LENGTH_LONG).show();
 
@@ -169,10 +173,10 @@ private AutoCompleteTextView mAutocompleteView;
                     }
                 }
         );
+         btnshare = (FloatingActionButton) findViewById(R.id.btnshare);
+        btnshare.setOnClickListener(new View.OnClickListener() {
 
-        btnshare = (Button) findViewById(R.id.btnshare);
-        btnshare.setOnClickListener(
-                new View.OnClickListener() {
+
                     @Override
                     public void onClick(View v) {
 
@@ -197,7 +201,7 @@ private AutoCompleteTextView mAutocompleteView;
                 }
         );
 
-        btnreshare = (Button) findViewById(R.id.btnreshare);
+        btnreshare = (FloatingActionButton) findViewById(R.id.btnreshare);
         btnreshare.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -278,9 +282,10 @@ private AutoCompleteTextView mAutocompleteView;
         mAutocompleteView = (AutoCompleteTextView)
                 findViewById(R.id.autocomplete_places);
 
+        LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
 
         mAdapter = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
-                mGoogleApiClient, BOUNDS_GREATER_SYDNEY, null);
+                mGoogleApiClient, bounds, null);
         mAutocompleteView.setAdapter(mAdapter);
 
         // Register a listener that receives callbacks when a suggestion has been selected
@@ -291,12 +296,14 @@ private AutoCompleteTextView mAutocompleteView;
             @Override
             public void onClick(View v) {
                 mAutocompleteView.setText("");
+                mMap.clear();
             }
         });
 
-
-
     }
+
+
+
 
     private AdapterView.OnItemClickListener mAutocompleteClickListener
             = new AdapterView.OnItemClickListener() {
@@ -340,10 +347,16 @@ private AutoCompleteTextView mAutocompleteView;
                 return;
             }
             // Get the Place object from the buffer.
-            final Place place = places.get(0);
 
+            place = places.get(0);
             // Format details of the place for display and show it in a TextView.
             endPointLatLong = place.getLatLng().toString();
+            mMap.addMarker(new MarkerOptions()
+                    .position(place.getLatLng())
+                    .title(place.getName().toString()));
+
+
+          //  mAutocompleteView.setText(place.getName());
 
 
             places.release();
@@ -458,12 +471,12 @@ private AutoCompleteTextView mAutocompleteView;
                         .tilt(30)                   // Sets the tilt of the camera to 30 degrees
                         .build();                   // Creates a CameraPosition from the builder
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
+
             }
 
     }
-
-
-
 
 
     private Location getLastKnownLocation() {
@@ -516,6 +529,8 @@ private AutoCompleteTextView mAutocompleteView;
 
 
 
+
+
     /**
      * Async task class to get json by making HTTP call
      * */
@@ -532,6 +547,7 @@ private AutoCompleteTextView mAutocompleteView;
 
         }
 
+
         @Override
         protected Void doInBackground(Void... arg0) {
             // Creating service handler class instance
@@ -544,11 +560,15 @@ private AutoCompleteTextView mAutocompleteView;
             double longitude = myLocation.getLongitude();
             String finalLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
 
-            String url_user_start_loc;
-            if(endPointLatLong !=null){
-                url_user_start_loc = urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc="+endPointLatLong+"&uid="+uid;
-            }else{
-                url_user_start_loc = urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc=null&uid="+uid;
+            String url_user_start_loc = null;
+            try {
+                if(endPointLatLong !=null){
+                    url_user_start_loc = urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc="+ URLEncoder.encode(endPointLatLong, "utf-8") + "&uid=" + uid;
+                }else{
+                    url_user_start_loc = urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc=null&uid="+uid;
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
 
 
@@ -594,9 +614,9 @@ private AutoCompleteTextView mAutocompleteView;
 
             callAsynchronousTask();
 
-            btnstop = (Button) findViewById(R.id.btnstop);
-            btnreshare = (Button) findViewById(R.id.btnreshare);
-            btnshare = (Button) findViewById((R.id.btnshare));
+            btnstop = (FloatingActionButton) findViewById(R.id.btnstop);
+            btnreshare = (FloatingActionButton) findViewById(R.id.btnreshare);
+            btnshare = (FloatingActionButton) findViewById((R.id.btnshare));
             if(url_code != null) {
                 sharingIntent.setType("text/plain");
                 String shareBody = "Check you friend location status here "+urlDomain+"/current_loc.php?action=getLocation&url_code="+url_code;
@@ -607,7 +627,7 @@ private AutoCompleteTextView mAutocompleteView;
             }else{
                 Toast.makeText(MapsMasterActivity.this, "Please click on share location again.", Toast.LENGTH_LONG).show();
             }
-            if (btnstop.getVisibility() == View.INVISIBLE && btnreshare.getVisibility() == View.INVISIBLE) {
+            if (btnstop.getVisibility() == View.GONE && btnreshare.getVisibility() == View.GONE) {
 
                 // Either gone or invisible
                 btnstop.setVisibility(View.VISIBLE);
@@ -616,7 +636,7 @@ private AutoCompleteTextView mAutocompleteView;
 
             if (btnshare.getVisibility() == View.VISIBLE) {
                 // Either gone or invisible
-                btnshare.setVisibility(View.INVISIBLE);
+                btnshare.setVisibility(View.GONE);
             }
 
 

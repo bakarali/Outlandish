@@ -24,12 +24,9 @@ class Current_loc {
 	public function get_current_loc() {
 		$conn = new dbConnection ();
 		
-		 $get_current_loc_sql = "SELECT current_loc FROM CURRENT_LOC WHERE url_code = '" . $_GET ['url_code'] . "' order by clid desc limit 1;";
-
-		
+		$get_current_loc_sql = "SELECT current_loc FROM CURRENT_LOC WHERE url_code = '" . $_GET ['url_code'] . "' order by clid desc limit 1;";
 		
 		// $sql = 'SELECT * FROM CURRENT_LOC WHERE url_code =' .$_GET ['url_code'].';';
-		
 		
 		$result = mysqli_query ( $conn->connectToDatabase (), $get_current_loc_sql );
 		
@@ -68,40 +65,36 @@ class Current_loc {
 		$uid;
 		$name;
 		
-		$user_start_loc_sql = "SELECT start_loc,uid FROM USER_START_LOC WHERE url_code = '". $_GET['url_code']."' LIMIT 1";
+		$user_start_loc_sql = "SELECT start_loc,end_loc,uid FROM USER_START_LOC WHERE url_code = '" . $_GET ['url_code'] . "' LIMIT 1";
+		
+		
 		
 		$start_result = mysqli_query ( $conn->connectToDatabase (), $user_start_loc_sql );
-		$current_location;
-		
-
+		$user_start_loc;
+		$user_end_loc;
+		$uid;
+		if (mysqli_num_rows ( $start_result ) > 0) {
+			// $r = mysql_fetch_assoc ( $result );
+			$r = mysqli_fetch_assoc ( $start_result );
+			$user_start_loc = $r ['start_loc'];
+			$user_end_loc = $r['end_loc'];
+			$uid = $r ['uid'];
 			
-			
-			if (mysqli_num_rows($start_result) > 0) {
-				// $r = mysql_fetch_assoc ( $result );
-				$r = mysqli_fetch_assoc ($start_result);
-				$current_location = $r['start_loc'];
-
-				$uid = $r['uid'];
-				
-				$user_detail_sql = "Select name from USER_INFO where uid='".$uid."'";
-				$user_detail_result = mysqli_query($conn->connectToDatabase(), $user_detail_sql);
-				if(mysqli_num_rows($user_detail_result)){
-					$row = mysqli_fetch_assoc($user_detail_result);
-					$name = $row['name'];
-						
-				}else {
-						
-				}
-			}else {
-				
+			$user_detail_sql = "Select name from USER_INFO where uid='" . $uid . "'";
+			$user_detail_result = mysqli_query ( $conn->connectToDatabase (), $user_detail_sql );
+			if (mysqli_num_rows ( $user_detail_result )) {
+				$row = mysqli_fetch_assoc ( $user_detail_result );
+				$name = $row ['name'];
+			} else {
 			}
-			
-			$conn->closeConnection();
-			
-			$loc = explode(",",$current_location);
-			
+		} else {
+		}
 		
-		 
+		$conn->closeConnection ();
+		
+		$start_loc = explode ( ",", $user_start_loc );
+		$end_loc = explode( ",", $user_end_loc );
+		
 		$html = '<!DOCTYPE html>
 <html>
   <head>
@@ -129,8 +122,8 @@ class Current_loc {
 // failed.", it means you probably did not give permission for the browser to
 // locate you.
  var map;
-//var url = "http://192.168.1.8/current_loc.php?action=get_current_loc&url_code='.$_GET['url_code'].'";
- var url = "http://www.techhunger.com/current_loc.php?action=get_current_loc&url_code='.$_GET['url_code'].'";
+//var url = "http://192.168.1.8/current_loc.php?action=get_current_loc&url_code=' . $_GET ['url_code'] . '";
+ var url = "http://www.techhunger.com/current_loc.php?action=get_current_loc&url_code=' . $_GET ['url_code'] . '";
   var infoWindow;
 				
 function initMap() {
@@ -140,31 +133,58 @@ map =  new google.maps.Map(document.getElementById("map"), {
     center: {lat: -34.397, lng: 150.644},
     zoom: 16
   });
+ 	
 				infoWindow = new google.maps.InfoWindow({map: map});
 				
 				
   
   
-   var lating = parseFloat('.$loc[0].');
-	 var lngting = parseFloat('.$loc[1].');	
+   var lating = parseFloat(' . $start_loc [0] . ');
+	 var lngting = parseFloat(' . $start_loc [1] . ');	
 				
 	var pos = {
-	 lat:'.$loc[0].',
-	  lng:'.$loc[1].'			
+	 lat:' . $start_loc [0] . ',
+	  lng:' . $start_loc [1] . '			
 	}
-
+	var endLating = parseFloat(' . $end_loc [0] . ');
+	 var endLongting1 = parseFloat(' . $end_loc [1] . ');	
+	var endLat ="' . $end_loc [0] . '";
+	var endLong = "' . $end_loc [1] . '";		
+	if(	endLat != "" || endLong  != ""){
+	var end_pos = {
+	 lat:parseFloat(endLat),
+	  lng:parseFloat(endLong)			
+	}
+	
+var directionsDisplay = new google.maps.DirectionsRenderer({
+    map: map
+  });
+	var request = {
+    destination: end_pos,
+    origin: pos,
+    travelMode: google.maps.TravelMode.DRIVING
+  };
+	  		var directionsService = new google.maps.DirectionsService();
+	  		directionsService.route(request, function(response, status) {
+    if (status == google.maps.DirectionsStatus.OK) {
+   
+      directionsDisplay.setDirections(response);
+    }
+  });		
+	
+}  		
       infoWindow.setPosition(pos);
-      infoWindow.setContent("'.$name.'");
+      infoWindow.setContent("' . $name . '");
       map.setCenter(pos);
     
   }
-				
+			
 //updatelocation function
 function cUpdateLocation(){
-				
+				var lat1 ;
+			var lng1 ;	
 				setInterval(function(){
-					var lat1 ;
-					var lng1 ;
+					
 					 $.ajax({
 					type:"GET",
                     url: url,
@@ -181,9 +201,16 @@ function cUpdateLocation(){
 	 pos = {
 	 lat:lat1,
 	 lng:lng1	
+      		
 	}
+     
 	infoWindow.setPosition(pos);
-						
+  
+	
+ 		
+
+ 
+ 
                         
                     }
                 });
@@ -194,7 +221,8 @@ function cUpdateLocation(){
 				
 	
 	}
-				
+      		
+		
 cUpdateLocation();				
 				
 				

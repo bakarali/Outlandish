@@ -1,51 +1,89 @@
-
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/coordinatorLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center">
+    tools:context=".FABActivity">
 
 
-    <FrameLayout
+   <!--<RelativeLayout-->
+       <!--android:layout_width="match_parent"-->
+       <!--android:layout_height="50dp"-->
+       <!--android:orientation="horizontal" android:layout_weight="1"-->
+       <!--android:clickable="false">-->
+      <!-- -->
+   <!--</RelativeLayout>-->
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF">
+        android:layout_height="fill_parent"
+        android:orientation="vertical" android:layout_weight="1">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/map"
+            tools:context="com.techhunger.com.outlandish.MapsMasterActivity"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+
+            />
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" android:orientation="horizontal"
+            android:layout_margin="10dp"
+            android:id="@+id/relativeLayout"   android:focusable="true" android:focusableInTouchMode="true"
+            android:background="#EEEEEE">
+
         <AutoCompleteTextView
             android:id="@+id/autocomplete_places"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:hint="@string/autocomplete_hint"
-            android:layout_marginTop="20dp"
-
+            android:hint="@string/autocomplete_hint" android:padding="10dp"
+            android:nextFocusUp="@id/autocomplete_places"
+            android:nextFocusLeft="@id/autocomplete_places"
+            android:singleLine="true"
             android:textColor="@android:color/primary_text_light"
-            android:background="#FFFFFF" />
+            android:background="#F5F5F5"
+            android:typeface="normal"
+            android:focusableInTouchMode="true"
+            android:drawableLeft="@mipmap/ic_search_black"
+            />
 
         <Button
             android:id="@+id/button_clear"
-            android:layout_width="40dp"
-            android:layout_height="35dp"
-            android:layout_marginTop="08dp"
-            android:layout_gravity="right|center_vertical"
-            android:background="@android:drawable/ic_menu_close_clear_cancel" />
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@mipmap/ic_clear_black"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"  />
+        </RelativeLayout>
 
-    </FrameLayout>
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="380dp"
-        android:layout_marginTop="0dp"
-        >
 
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
 
-    android:id="@+id/map"
-    tools:context="com.techhunger.com.outlandish.MapsMasterActivity"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
-    />
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent" android:orientation="vertical"
+    android:layout_alignParentRight="true"
+    android:layout_alignParentEnd="true"
+    android:gravity="bottom|end"
+    android:layout_below="@+id/relativeLayout">
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnshare"
+        android:layout_width="70dp"
+        android:layout_height="61dp"
+
+        android:src="@mipmap/ic_share"
+        app:fabSize="normal"
+        app:layout_anchor="@id/coordinatorLayout"
+        app:layout_anchorGravity="bottom"
+        app:rippleColor="#F06292"
+
+        android:layout_gravity="bottom" android:layout_margin="10dp" />
         <!--<AutoCompleteTextView-->
             <!--android:id="@+id/autocomplete_places"-->
             <!--android:layout_width="match_parent"-->
@@ -64,41 +102,64 @@
             <!--android:layout_gravity="right"-->
             <!--android:background="@android:drawable/ic_menu_close_clear_cancel" />-->
 
-    </FrameLayout>
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="100dp"
-    android:orientation="vertical"
-    android:gravity="center">
-    <Button
-        android:id="@+id/btnshare"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:text="share"
-        android:background="#009688"
-        android:textSize="25dp"
-        android:textColor="#E3F2FD" />
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" android:orientation="vertical">
-    <Button
-        android:id="@+id/btnreshare" android:visibility="invisible"
-        android:layout_width="fill_parent"
-        android:layout_height="50dp"
-        android:text="Reshare"
-        android:background="#009688"
-        android:textColor="#E3F2FD" />
 
-    <Button
-        android:id="@+id/btnstop" android:visibility="invisible"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="Stop"
-        android:background="#F44336"
-        android:textColor="#E3F2FD" />
-</LinearLayout>
 
-</RelativeLayout>
+    <!--<Button-->
+        <!--android:id="@+id/btnshare"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--android:background="#009688"-->
+        <!--android:textSize="25dp"-->
+        <!--android:textColor="#E3F2FD"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:text="share"-->
+        <!--style="@style/Base.TextAppearance.AppCompat.Button" />-->
 
-</LinearLayout>
+
+
+    <!--<Button-->
+        <!--android:id="@+id/btnreshare" android:visibility="invisible"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:text="Reshare"-->
+        <!--android:background="#009688"-->
+        <!--android:textColor="#E3F2FD" />-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnreshare" android:visibility="gone"
+        android:layout_width="70dp"
+        android:layout_height="61dp"
+        android:src="@mipmap/ic_share"
+        app:fabSize="normal"
+        app:layout_anchor="@id/coordinatorLayout"
+        app:layout_anchorGravity="bottom|right|end"
+        app:rippleColor="#F06292"
+          android:layout_margin="10dp"
+        android:layout_gravity="right|center_vertical"
+        />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnstop" android:visibility="gone"
+        android:layout_width="70dp"
+        android:layout_height="61dp"
+        android:src="@mipmap/ic_stop"
+        app:fabSize="normal"
+       app:backgroundTint="#B71C1C"
+        app:layout_anchor="@id/coordinatorLayout"
+        app:layout_anchorGravity="bottom|right|end"
+        app:rippleColor="#F44336"
+          android:layout_margin="10dp"
+        android:layout_gravity="right|center_vertical"
+        />
+    <!--<Button-->
+        <!--android:id="@+id/btnstop" android:visibility="invisible"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:text="Stop"-->
+        <!--android:background="#F44336"-->
+        <!--android:textColor="#E3F2FD" />--></LinearLayout>
+        </RelativeLayout>
+
+
+
+
+
+</android.support.design.widget.CoordinatorLayout>
