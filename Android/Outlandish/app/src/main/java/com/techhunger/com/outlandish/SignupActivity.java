@@ -34,7 +34,6 @@ public class SignupActivity extends AppCompatActivity {
   //  private static final String urlDomain = "192.168.1.8";
    private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
-    // private static final String url_user_start_loc =  "http://"+urlDomain+"/user_start_loc.php?start_loc=2.2322&end_loc=null&uid=25";
     private ProgressDialog pDialog;
     public static final String PREFS_NAME = "UserData";
 
@@ -52,7 +51,9 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
         final EditText inputNameET = (EditText) findViewById(R.id.name);
         final EditText inputMobileNoET =(EditText) findViewById(R.id.phone_no);
         final EditText inputEmailIdET = (EditText)findViewById(R.id.emailid);

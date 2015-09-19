@@ -74,7 +74,7 @@ private AutoCompleteTextView mAutocompleteView;
     String name = null;
      Handler handler = new Handler();
     Runnable runnable =null;
-
+    String finalLoc;
     FloatingActionButton btnstop = null;
     FloatingActionButton btnshare = null;
 
@@ -173,8 +173,8 @@ private AutoCompleteTextView mAutocompleteView;
                             btnstop.setVisibility(View.GONE);
                             btnreshare.setVisibility(View.GONE);
                             btnshare.setVisibility(View.VISIBLE);
-                            Toast.makeText(MapsMasterActivity.this, "update location stopped.", Toast.LENGTH_LONG).show();
-
+                            //Toast.makeText(MapsMasterActivity.this, "update location stopped.", Toast.LENGTH_LONG).show();
+                            new StopShareLocation().execute();
 
                         }
 
@@ -583,14 +583,15 @@ private AutoCompleteTextView mAutocompleteView;
             Location myLocation = getLastKnownLocation();
             double latitude = myLocation.getLatitude();
             double longitude = myLocation.getLongitude();
-            String finalLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
+
+            finalLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
 
             String url_user_start_loc = null;
             try {
                 if(endPointLatLong !=null){
-                    url_user_start_loc = urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc="+ URLEncoder.encode(endPointLatLong, "utf-8") + "&uid=" + uid;
+                    url_user_start_loc = urlDomain+"/user_start_loc.php?action=share_location&start_loc="+finalLoc+"&end_loc="+ URLEncoder.encode(endPointLatLong, "utf-8") + "&uid=" + uid;
                 }else{
-                    url_user_start_loc = urlDomain+"/user_start_loc.php?start_loc="+finalLoc+"&end_loc=null&uid="+uid;
+                    url_user_start_loc = urlDomain+"/user_start_loc.php?action=share_location&start_loc="+finalLoc+"&end_loc=null&uid="+uid;
                 }
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -771,6 +772,73 @@ private AutoCompleteTextView mAutocompleteView;
 
     }
 
+
+    /**
+     * Async task class to get json by making HTTP call
+     * */
+    private class StopShareLocation extends AsyncTask<Void, Void, Void> {
+        Boolean isLSStopped = false;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(MapsMasterActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            // Creating service handler class instance
+            ServiceHandler sh = new ServiceHandler();
+
+            // Making a request to url and getting response
+
+            String url_user_stop_loc = null;
+            if(url_code!=null) {
+                url_user_stop_loc = urlDomain + "/user_start_loc.php?action=stop_share_location&url_code=" + url_code;
+            }
+
+
+            String jsonStr = sh.makeServiceCall(url_user_stop_loc, ServiceHandler.GET);
+
+            if (jsonStr != null) {
+                try{
+                    JSONObject jobj = new JSONObject(jsonStr);
+                   if(jobj.getString("status").equals("OK") && jobj.getString("message").equals("success")){
+                       isLSStopped = true;
+                   }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            } else {
+                Log.e("ServiceHandler", "Couldn't get any data from the url");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            /**
+             * Updating parsed JSON data into ListView
+             * */
+
+            if(isLSStopped)
+            {
+                Toast.makeText(MapsMasterActivity.this, "Stopped.", Toast.LENGTH_LONG).show();
+            }
+        }
+
+    }
 
 
 }
