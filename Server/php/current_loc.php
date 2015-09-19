@@ -1,4 +1,6 @@
 <?php
+require_once 'libs/vendor/autoload.php';
+
 include ('dbConnection.php');
 /**
  */
@@ -243,6 +245,15 @@ if ($_GET ['action'] == 'send_current_loc') {
 	$get->get_current_loc ();
 } elseif ($_GET ['action'] == 'getLocation') {
 	$get->getLocation ();
+}elseif ($_GET ['action'] == 'test') {
+	
+	$loader = new Twig_Loader_Filesystem('templates/');
+	$twig = new Twig_Environment($loader);
+	$template = $twig->loadTemplate('currentLocation.html');
+	echo $template->render(array(
+			'name'=>'Manzur'
+	));
+	
 }
 
 ?>
