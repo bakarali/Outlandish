@@ -27,9 +27,19 @@ class Current_loc {
 		$conn = new dbConnection ();
 		
 		$get_current_loc_sql = "SELECT current_loc FROM CURRENT_LOC WHERE url_code = '" . $_GET ['url_code'] . "' order by clid desc limit 1;";
+		 $get_status_sql = "SELECT status FROM USER_START_LOC WHERE url_code = '" . $_GET ['url_code'] ."';";
 		
 		// $sql = 'SELECT * FROM CURRENT_LOC WHERE url_code =' .$_GET ['url_code'].';';
 		
+		$resultStatus = mysqli_query($conn->connectToDatabase (), $get_status_sql);
+		$status=0;
+		//print_r($resultStatus);
+		$rs = mysqli_fetch_assoc ($resultStatus);
+			
+		if (count($rs) > 0 && $rs['status'] == 1 ) {
+			
+			$status = 1;
+		}
 		$result = mysqli_query ( $conn->connectToDatabase (), $get_current_loc_sql );
 		
 		if (! $result) {
@@ -44,7 +54,9 @@ class Current_loc {
 				$r = mysqli_fetch_assoc ( $result );
 				// save the fetched row and add it to the array.
 				$response = array (
-						'current_loc' => $r ['current_loc'] 
+						'current_loc' => $r ['current_loc'],
+						'status'=>$status
+						
 				);
 				$json = array (
 						"status" => "OK",
@@ -94,147 +106,39 @@ class Current_loc {
 		
 		$conn->closeConnection ();
 		
-		$start_loc = explode ( ",", $user_start_loc );
-		$end_loc = explode( ",", $user_end_loc );
+		$start_loc = explode ( ",", $user_start_loc);
+		$start_loc_lat=$start_loc[0];
+		$start_loc_lng=$start_loc[1];
 		
-		$html = '<!DOCTYPE html>
-<html>
-  <head>
-    <title>Geolocation</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <meta charset="utf-8">
-				<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <style>
-				
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        height: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <script>
-// Note: This example requires that you consent to location sharing when
-// prompted by your browser. If you see the error "The Geolocation service
-// failed.", it means you probably did not give permission for the browser to
-// locate you.
- var map;
-//var url = "http://192.168.1.8/current_loc.php?action=get_current_loc&url_code=' . $_GET ['url_code'] . '";
- var url = "http://www.techhunger.com/current_loc.php?action=get_current_loc&url_code=' . $_GET ['url_code'] . '";
-  var infoWindow;
-				
-function initMap() {
-				  
- 
-map =  new google.maps.Map(document.getElementById("map"), {
-    center: {lat: -34.397, lng: 150.644},
-    zoom: 16
-  });
- 	
-				infoWindow = new google.maps.InfoWindow({map: map});
-				
-				
-  
-  
-   var lating = parseFloat(' . $start_loc [0] . ');
-	 var lngting = parseFloat(' . $start_loc [1] . ');	
-				
-	var pos = {
-	 lat:' . $start_loc [0] . ',
-	  lng:' . $start_loc [1] . '			
-	}
-	var endLating = parseFloat(' . $end_loc [0] . ');
-	 var endLongting1 = parseFloat(' . $end_loc [1] . ');	
-	var endLat ="' . $end_loc [0] . '";
-	var endLong = "' . $end_loc [1] . '";		
-	if(	endLat != "" || endLong  != ""){
-	var end_pos = {
-	 lat:parseFloat(endLat),
-	  lng:parseFloat(endLong)			
-	}
-	
-var directionsDisplay = new google.maps.DirectionsRenderer({
-    map: map
-  });
-	var request = {
-    destination: end_pos,
-    origin: pos,
-    travelMode: google.maps.TravelMode.DRIVING
-  };
-	  		var directionsService = new google.maps.DirectionsService();
-	  		directionsService.route(request, function(response, status) {
-    if (status == google.maps.DirectionsStatus.OK) {
-   
-      directionsDisplay.setDirections(response);
-    }
-  });		
-	
-}  		
-      infoWindow.setPosition(pos);
-      infoWindow.setContent("' . $name . '");
-      map.setCenter(pos);
-    
-  }
+		if($user_end_loc !== NULL){
+			$end_loc = explode( ",", $user_end_loc);
+			$end_loc_lat=$end_loc[0];
+			$end_loc_lng=$end_loc[1];
+		}else{
+			$end_loc_lat="";
+			$end_loc_lng="";
+		}
+		
+		
+		$loader = new Twig_Loader_Filesystem('templates/');
+	$twig = new Twig_Environment($loader);
+	$template = $twig->loadTemplate('currentLocation.html');
+	echo $template->render(array(
+			'name'=>ucfirst($name),
+			'start_loc_lat'=>$start_loc_lat,
+			'start_loc_lng'=>$start_loc_lng,
+			'end_loc_lat'=>$end_loc_lat,
+			'end_loc_lng'=>$end_loc_lng,
+			'url_code'=>$_GET ['url_code']
 			
-//updatelocation function
-function cUpdateLocation(){
-				var lat1 ;
-			var lng1 ;	
-				setInterval(function(){
+			
+			
+	));
 					
-					 $.ajax({
-					type:"GET",
-                    url: url,
-                    //force to handle it as text
-                    dataType: "json",
-                    success: function(data) {
-					
-                        var location = data.response.current_loc;
-   					 	var res = location.split(",");
-      		
-   						  lat1 = parseFloat(res[0]);
-						  lng1 = parseFloat(res[1]);
-      				
-	 pos = {
-	 lat:lat1,
-	 lng:lng1	
-      		
-	}
-     
-	infoWindow.setPosition(pos);
-  
-	
- 		
-
- 
- 
-                        
-                    }
-                });
-				
-				
-				
-	}, 5000);
-				
-	
-	}
-      		
 		
-cUpdateLocation();				
-				
-				
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?signed_in=true&callback=initMap&sensor=false"
-        async defer>
-    </script>
-  </body>
-</html>';
-		echo $html;
+		
+		
+		
 	}
 }
 
@@ -245,15 +149,6 @@ if ($_GET ['action'] == 'send_current_loc') {
 	$get->get_current_loc ();
 } elseif ($_GET ['action'] == 'getLocation') {
 	$get->getLocation ();
-}elseif ($_GET ['action'] == 'test') {
-	
-	$loader = new Twig_Loader_Filesystem('templates/');
-	$twig = new Twig_Environment($loader);
-	$template = $twig->loadTemplate('currentLocation.html');
-	echo $template->render(array(
-			'name'=>'Manzur'
-	));
-	
 }
 
 ?>

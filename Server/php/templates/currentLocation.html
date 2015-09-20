@@ -1,1 +1,156 @@
-Hello {{name}}
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Geolocation</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<meta charset="utf-8">
+<script
+	src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<style>
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#map {
+	height: 100%;
+}
+</style>
+</head>
+<body>
+	<div id="map"></div>
+	<script>
+// Note: This example requires that you consent to location sharing when
+// prompted by your browser. If you see the error "The Geolocation service
+// failed.", it means you probably did not give permission for the browser to
+// locate you.
+ var map;
+//var url = "http://192.168.1.8/current_loc.php?action=get_current_loc&url_code={{url_code}}";
+ var url = "http://www.techhunger.com/current_loc.php?action=get_current_loc&url_code={{url_code}}";
+ //var url = "http://localhost/current_loc.php?action=get_current_loc&url_code={{url_code}}";		
+  var infoWindow;
+				
+function initMap() {
+				  
+ 
+map =  new google.maps.Map(document.getElementById("map"), {
+    center: {lat: -34.397, lng: 150.644},
+    zoom: 16
+  });
+ 	
+				infoWindow = new google.maps.InfoWindow({map: map});
+				
+				
+  
+  
+   var lating = parseFloat( {{start_loc_lat}});
+	 var lngting = parseFloat({{start_loc_lng}});	
+				
+	var pos = {
+	 lat:{{start_loc_lat}},
+	  lng:{{start_loc_lng}}			
+	}
+	
+	
+	var endLat,endLong;
+	{% if (end_loc_lat is empty) or (end_loc_lng is empty) %}
+		 endLat ="";
+	 	endLong ="";	
+	 {% else %}
+		 endLat ={{end_loc_lat}};
+		 endLong = {{end_loc_lng}};	 
+	{% endif %}
+    	 
+	
+		
+	if(	endLat != "" || endLong  != ""){
+	var end_pos = {
+	 lat:parseFloat(endLat),
+	  lng:parseFloat(endLong)			
+	}
+	
+var directionsDisplay = new google.maps.DirectionsRenderer({
+    map: map
+  });
+	var request = {
+    destination: end_pos,
+    origin: pos,
+    travelMode: google.maps.TravelMode.DRIVING
+  };
+	  		var directionsService = new google.maps.DirectionsService();
+	  		directionsService.route(request, function(response, status) {
+    if (status == google.maps.DirectionsStatus.OK) {
+   
+      directionsDisplay.setDirections(response);
+    }
+  });		
+	
+}  		
+      infoWindow.setPosition(pos);
+      infoWindow.setContent("{{name}} ");
+      map.setCenter(pos);
+      		
+		cUpdateLocation(infoWindow);	
+    
+  }
+	var refreshIntervalId
+//updatelocation function
+
+function cUpdateLocation(passInfoWindow){
+				
+      		 refreshIntervalId = setInterval(getlocation, 15000,passInfoWindow);
+				
+	
+	}
+    function getlocation(passInfoWindow){
+		var lat1 ;
+		var lng1 ;	
+      	
+					
+					
+					 $.ajax({
+					type:"GET",
+                    url: url,
+                    //force to handle it as text
+                    dataType: "json",
+                    success: function(data) {
+					if(data.response.status==0){
+                        var location = data.response.current_loc;
+   					 	var res = location.split(",");
+      		
+   						  lat1 = parseFloat(res[0]);
+						  lng1 = parseFloat(res[1]);
+      				
+						 pos = {
+	 							lat:lat1,
+	 							lng:lng1	
+      		
+						}
+     
+						passInfoWindow.setPosition(pos);
+      		
+            		}else{
+    		  		
+	clearInterval(refreshIntervalId);
+      		alert("{{name}} has stopped sharing.");
+	}
+                  }
+                });
+				
+				
+				
+	
+	}
+      		
+				
+
+				
+    </script>
+	<script
+		src="https://maps.googleapis.com/maps/api/js?signed_in=true&callback=initMap&sensor=false"
+		async defer>
+    </script>
+</body>
+</html>

@@ -90,12 +90,12 @@
         android:id="@+id/btnshare"
         android:layout_width="70dp"
         android:layout_height="61dp"
-        app:backgroundTint="#2196F3"
+        app:backgroundTint="#00695C"
         android:src="@mipmap/ic_share"
         app:fabSize="normal"
         app:layout_anchor="@id/coordinatorLayout"
         app:layout_anchorGravity="bottom"
-        app:rippleColor="#64B5F6"
+        app:rippleColor="#80CBC4"
 
         android:layout_gravity="bottom" android:layout_margin="10dp" />
 
@@ -147,8 +147,8 @@
         app:fabSize="normal"
         app:layout_anchor="@id/coordinatorLayout"
         app:layout_anchorGravity="bottom|right|end"
-        app:backgroundTint="#2196F3"
-        app:rippleColor="#64B5F6"
+        app:backgroundTint="#00695C"
+        app:rippleColor="#80CBC4"
           android:layout_margin="10dp"
         android:layout_gravity="right|center_vertical"
         />
