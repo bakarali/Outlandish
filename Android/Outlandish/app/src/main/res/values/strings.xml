@@ -1,11 +1,11 @@
 <resources>
-    <string name="app_name">PlotMe</string>
+    <string name="app_name">Terminus</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_maps_master">PlotMe</string>
+    <string name="title_activity_maps_master">Terminus</string>
     <string name="title_activity_signup">Signup</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_maps">Map</string>
-    <string name="autocomplete_hint">Enter your end location</string>
+    <string name="autocomplete_hint">Search destination</string>
     <string name="nav_item_home">Home</string>
     <string name="nav_item_friends">Friends</string>
     <string name="nav_item_notifications">Messages</string>

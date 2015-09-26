@@ -8,7 +8,7 @@ android {
         applicationId "com.techhunger.com.outlandish"
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 7
+        versionCode 9
         versionName "1.02"
     }
     signingConfigs {

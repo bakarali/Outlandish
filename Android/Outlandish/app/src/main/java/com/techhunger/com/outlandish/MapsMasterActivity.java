@@ -68,16 +68,16 @@ private AutoCompleteTextView mAutocompleteView;
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
 
 
-
+    Boolean chkshared = false;
     String url_code = null;
     String uid = null;
     String name = null;
-     Handler handler = new Handler();
+    Handler handler = new Handler();
     Runnable runnable =null;
     String finalLoc;
     FloatingActionButton btnstop = null;
     FloatingActionButton btnshare = null;
-
+    Button clearButton;
     FloatingActionButton btnreshare = null;
     FloatingActionButton btnmylocation = null;
 
@@ -116,8 +116,7 @@ private AutoCompleteTextView mAutocompleteView;
             name = prefs.getString("name", null);
 
             onClickButtonListener();
-            autoPlaces();
-
+               autoPlaces();
 
         }else {
             //popup box
@@ -175,6 +174,8 @@ private AutoCompleteTextView mAutocompleteView;
                             btnshare.setVisibility(View.VISIBLE);
                             //Toast.makeText(MapsMasterActivity.this, "update location stopped.", Toast.LENGTH_LONG).show();
                             new StopShareLocation().execute();
+                            chkshared = false;
+                            endPointLatLong=null;
 
                         }
 
@@ -193,6 +194,7 @@ private AutoCompleteTextView mAutocompleteView;
                         if (netInfo != null && netInfo.isConnectedOrConnecting()) {
                             if (uid != null) {
                                 new GetUserStartLocation().execute();
+                                chkshared = true;
                             } else {
                                 Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
                                 startActivity(intent);
@@ -221,13 +223,15 @@ private AutoCompleteTextView mAutocompleteView;
                             if (url_code != null) {
                                 sharingIntent.setType("text/plain");
                                 String shareBody = "Check you friend location status here " + urlDomain + "/current_loc.php?action=getLocation&url_code=" + url_code;
-                                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "PlotMe Share Location");
+                                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Terminus Share Location");
                                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
                                 startActivityForResult(sharingIntent, 0);
+                                chkshared = true;
 
                             } else {
                                 new GetUserStartLocation().execute();
+                                chkshared = true;
                             }
 
 
@@ -297,7 +301,7 @@ private AutoCompleteTextView mAutocompleteView;
         mAutocompleteView.setAdapter(mAdapter);
 
         // Register a listener that receives callbacks when a suggestion has been selected
-        mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
+            mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
         // Set up the 'clear text' button that clears the text in the autocomplete view
         Button clearButton = (Button) findViewById(R.id.button_clear);
         clearButton.setOnClickListener(new View.OnClickListener() {
@@ -305,6 +309,7 @@ private AutoCompleteTextView mAutocompleteView;
             public void onClick(View v) {
                 mAutocompleteView.setText("");
                 mMap.clear();
+                endPointLatLong=null;
             }
         });
 
@@ -362,6 +367,10 @@ private AutoCompleteTextView mAutocompleteView;
                     .position(place.getLatLng())
                     .title(place.getName().toString()));
 
+            if(chkshared){
+                new updateEndLoc().execute();
+
+            }
 
           //  mAutocompleteView.setText(place.getName());
 
@@ -646,7 +655,7 @@ private AutoCompleteTextView mAutocompleteView;
             if(url_code != null) {
                 sharingIntent.setType("text/plain");
                 String shareBody = "Check you friend location status here "+urlDomain+"/current_loc.php?action=getLocation&url_code="+url_code;
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "PlotMe Share Location");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Terminus Share Location");
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
                 startActivityForResult(sharingIntent, 0);
@@ -835,6 +844,73 @@ private AutoCompleteTextView mAutocompleteView;
             if(isLSStopped)
             {
                 Toast.makeText(MapsMasterActivity.this, "Stopped.", Toast.LENGTH_LONG).show();
+            }
+        }
+
+    }
+    private class updateEndLoc extends AsyncTask<Void, Void, Void> {
+        Boolean isupadteendloc = false;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(MapsMasterActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            // Creating service handler class instance
+            ServiceHandler sh = new ServiceHandler();
+
+            // Making a request to url and getting response
+
+            String updateEndLocURL = null;
+            if(url_code!=null) {
+                try {
+                    updateEndLocURL = urlDomain + "/user_start_loc.php?action=updateEndLoc&url_code=" + url_code+"&end_loc="+URLEncoder.encode(endPointLatLong, "utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+            String jsonStr = sh.makeServiceCall(updateEndLocURL, ServiceHandler.GET);
+
+            if (jsonStr != null) {
+                try{
+                    JSONObject jobj = new JSONObject(jsonStr);
+                    if(jobj.getString("status").equals("OK") && jobj.getString("message").equals("success")){
+                        isupadteendloc = true;
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            } else {
+                Log.e("ServiceHandler", "Couldn't get any data from the url");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            /**
+             * Updating parsed JSON data into ListView
+             * */
+
+            if(isupadteendloc)
+            {
+                Toast.makeText(MapsMasterActivity.this, "Update end Location.", Toast.LENGTH_LONG).show();
             }
         }
 

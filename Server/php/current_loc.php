@@ -23,23 +23,27 @@ class Current_loc {
 		}
 		$conn->closeConnection ();
 	}
+
+
 	public function get_current_loc() {
 		$conn = new dbConnection ();
 		
 		$get_current_loc_sql = "SELECT current_loc FROM CURRENT_LOC WHERE url_code = '" . $_GET ['url_code'] . "' order by clid desc limit 1;";
-		 $get_status_sql = "SELECT status FROM USER_START_LOC WHERE url_code = '" . $_GET ['url_code'] ."';";
+		$get_status_sql = "SELECT status,end_loc FROM USER_START_LOC WHERE url_code = '" . $_GET ['url_code'] . "';";
 		
 		// $sql = 'SELECT * FROM CURRENT_LOC WHERE url_code =' .$_GET ['url_code'].';';
 		
-		$resultStatus = mysqli_query($conn->connectToDatabase (), $get_status_sql);
-		$status=0;
-		//print_r($resultStatus);
-		$rs = mysqli_fetch_assoc ($resultStatus);
-			
-		if (count($rs) > 0 && $rs['status'] == 1 ) {
+		$resultStatus = mysqli_query ( $conn->connectToDatabase (), $get_status_sql );
+		$status = 0;
+		// print_r($resultStatus);
+		$rs = mysqli_fetch_assoc ( $resultStatus );
+		
+		if (count ( $rs ) > 0 && $rs ['status'] == 1) {
 			
 			$status = 1;
 		}
+		
+
 		$result = mysqli_query ( $conn->connectToDatabase (), $get_current_loc_sql );
 		
 		if (! $result) {
@@ -55,9 +59,10 @@ class Current_loc {
 				// save the fetched row and add it to the array.
 				$response = array (
 						'current_loc' => $r ['current_loc'],
-						'status'=>$status
-						
-				);
+						'end_loc'=>$rs['end_loc'],
+						'status' => $status 
+				)
+				;
 				$json = array (
 						"status" => "OK",
 						"message" => "success",
@@ -81,8 +86,6 @@ class Current_loc {
 		
 		$user_start_loc_sql = "SELECT start_loc,end_loc,uid FROM USER_START_LOC WHERE url_code = '" . $_GET ['url_code'] . "' LIMIT 1";
 		
-		
-		
 		$start_result = mysqli_query ( $conn->connectToDatabase (), $user_start_loc_sql );
 		$user_start_loc;
 		$user_end_loc;
@@ -91,7 +94,7 @@ class Current_loc {
 			// $r = mysql_fetch_assoc ( $result );
 			$r = mysqli_fetch_assoc ( $start_result );
 			$user_start_loc = $r ['start_loc'];
-			$user_end_loc = $r['end_loc'];
+			$user_end_loc = $r ['end_loc'];
 			$uid = $r ['uid'];
 			
 			$user_detail_sql = "Select name from USER_INFO where uid='" . $uid . "'";
@@ -106,39 +109,31 @@ class Current_loc {
 		
 		$conn->closeConnection ();
 		
-		$start_loc = explode ( ",", $user_start_loc);
-		$start_loc_lat=$start_loc[0];
-		$start_loc_lng=$start_loc[1];
+		$start_loc = explode ( ",", $user_start_loc );
+		$start_loc_lat = $start_loc [0];
+		$start_loc_lng = $start_loc [1];
 		
-		if($user_end_loc !== NULL){
-			$end_loc = explode( ",", $user_end_loc);
-			$end_loc_lat=$end_loc[0];
-			$end_loc_lng=$end_loc[1];
-		}else{
-			$end_loc_lat="";
-			$end_loc_lng="";
+		if ($user_end_loc !== NULL) {
+			$end_loc = explode ( ",", $user_end_loc );
+			$end_loc_lat = $end_loc [0];
+			$end_loc_lng = $end_loc [1];
+		} else {
+			$end_loc_lat = "";
+			$end_loc_lng = "";
 		}
 		
-		
-		$loader = new Twig_Loader_Filesystem('templates/');
-	$twig = new Twig_Environment($loader);
-	$template = $twig->loadTemplate('currentLocation.html');
-	echo $template->render(array(
-			'name'=>ucfirst($name),
-			'start_loc_lat'=>$start_loc_lat,
-			'start_loc_lng'=>$start_loc_lng,
-			'end_loc_lat'=>$end_loc_lat,
-			'end_loc_lng'=>$end_loc_lng,
-			'url_code'=>$_GET ['url_code']
-			
-			
-			
-	));
-					
-		
-		
-		
-		
+		$loader = new Twig_Loader_Filesystem ( 'templates/' );
+		$twig = new Twig_Environment ( $loader );
+		$template = $twig->loadTemplate ( 'currentLocation.html' );
+		echo $template->render ( array (
+				'name' => ucfirst ( $name ),
+				'start_loc_lat' => $start_loc_lat,
+				'start_loc_lng' => $start_loc_lng,
+				'end_loc_lat' => $end_loc_lat,
+				'end_loc_lng' => $end_loc_lng,
+				'url_code' => $_GET ['url_code'] 
+		)
+		 );
 	}
 }
 

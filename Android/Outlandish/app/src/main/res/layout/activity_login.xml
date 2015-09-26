@@ -84,7 +84,7 @@
             android:id="@+id/btnlogin"
             android:layout_gravity="center_horizontal"
             android:textColor="#FAFAFA"
-            android:background="#2196F3" />
+            android:background="#00695C" />
 
         <Space
             android:layout_width="323dp"

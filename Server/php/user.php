@@ -11,48 +11,44 @@ class User {
 		$passwordDecrypt = sha1 ( $_GET ['password'] );
 		$checkuser = "SELECT uid FROM USER_INFO WHERE email_id='" . $_GET ['email_id'] . "' or mobile_number='" . $_GET ['mobile_number'] . "'";
 		$count = array ();
-			$result = $conn->query ( $checkuser );
-			$row = $result->fetch_assoc ();
-			if (count ( $row ) > 0) {
+		$result = $conn->query ( $checkuser );
+		$row = $result->fetch_assoc ();
+		if (count ( $row ) > 0) {
+			
+			// $response = array (
+			// 'status' => 'ERROR',
+			// 'message' => 'Already registered'
+			
+			// );
+			$response = array (
+					'status' => 'ERROR',
+					'message' => 'Already registered' 
+			)
+			;
+			echo json_encode ( $response );
+		} else {
+			$signupuser = "INSERT INTO USER_INFO VALUES ('uid','" . $_GET ['name'] . "','" . $_GET ['email_id'] . "','$passwordDecrypt','" . $_GET ['mobile_number'] . "','$date');";
+			
+			// $signupuser = "INSERT INTO GetURLSlug VALUES (50,'dd','dd','dd')";
+			
+			$result = mysqli_query ( $conn, $signupuser );
+			$last_uid = mysqli_insert_id ( $conn );
+			$response = array ();
+			if (! $result) {
 				
-// 				$response = array (
-// 						'status' => 'ERROR',
-// 						'message' => 'Already registered'
-						
-// 						);
+				echo '{"status":"ERROR","message":"Sorry"}';
+			} else {
 				$response = array (
-						'status' => 'ERROR',
-						'message' => 'Already registered'
-						
+						'status' => 'OK',
+						'message' => 'success',
+						'response' => array (
+								'uid' => $last_uid 
+						) 
 				);
 				echo json_encode ( $response );
-
-				
-				
-			}else {
-				$signupuser = "INSERT INTO USER_INFO VALUES ('uid','" . $_GET ['name'] . "','" . $_GET ['email_id'] . "','$passwordDecrypt','" . $_GET ['mobile_number'] . "','$date');";
-				
-				// $signupuser = "INSERT INTO GetURLSlug VALUES (50,'dd','dd','dd')";
-				
-				$result = mysqli_query ( $conn, $signupuser );
-				$last_uid = mysqli_insert_id ( $conn );
-				$response = array ();
-				if (!$result) {
-						
-					echo '{"status":"ERROR","message":"Sorry"}';
-				} else {
-					$response = array (
-							'status' => 'OK',
-							'message' => 'success',
-							'response' => array (
-									'uid' => $last_uid
-							)
-					);
-					echo json_encode ( $response );
-				}
-				$conn->closeConnection ();
 			}
-				
+			$conn->closeConnection ();
+		}
 	}
 	public function login() {
 		
