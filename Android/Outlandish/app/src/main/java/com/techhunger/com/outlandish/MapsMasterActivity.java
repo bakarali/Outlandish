@@ -67,7 +67,7 @@ private AutoCompleteTextView mAutocompleteView;
       private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
 
-
+    Boolean clrbtnpress=false;
     Boolean chkshared = false;
     String url_code = null;
     String uid = null;
@@ -303,13 +303,17 @@ private AutoCompleteTextView mAutocompleteView;
         // Register a listener that receives callbacks when a suggestion has been selected
             mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
         // Set up the 'clear text' button that clears the text in the autocomplete view
-        Button clearButton = (Button) findViewById(R.id.button_clear);
+         clearButton = (Button) findViewById(R.id.button_clear);
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mAutocompleteView.setText("");
                 mMap.clear();
                 endPointLatLong=null;
+                clrbtnpress = true;
+                if(url_code!=null) {
+                    new updateEndLoc().execute();
+                }
             }
         });
 
@@ -873,7 +877,12 @@ private AutoCompleteTextView mAutocompleteView;
             String updateEndLocURL = null;
             if(url_code!=null) {
                 try {
-                    updateEndLocURL = urlDomain + "/user_start_loc.php?action=updateEndLoc&url_code=" + url_code+"&end_loc="+URLEncoder.encode(endPointLatLong, "utf-8");
+                    if(clrbtnpress==true) {
+                        updateEndLocURL = urlDomain + "/user_start_loc.php?action=updateEndLoc&url_code=" + url_code + "&end_loc=null)";
+
+                    }else {
+                        updateEndLocURL = urlDomain + "/user_start_loc.php?action=updateEndLoc&url_code=" + url_code + "&end_loc=" + URLEncoder.encode(endPointLatLong, "utf-8");
+                    }
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -911,7 +920,9 @@ private AutoCompleteTextView mAutocompleteView;
             if(isupadteendloc)
             {
                 Toast.makeText(MapsMasterActivity.this, "Update end Location.", Toast.LENGTH_LONG).show();
+
             }
+
         }
 
     }
