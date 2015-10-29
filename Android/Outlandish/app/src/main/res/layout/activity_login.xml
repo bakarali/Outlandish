@@ -7,6 +7,7 @@
     tools:context="com.techhunger.com.outlandish.LoginActivity"
     android:theme="@style/AppTheme"
     android:background="#fafafa">
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
@@ -87,10 +88,15 @@
             android:background="#00695C" />
 
         <Space
+            android:layout_width="20px"
+            android:layout_height="20px" />
+
+        <Space
             android:layout_width="323dp"
             android:layout_height="126dp"
             android:layout_gravity="center_horizontal"
-            style="@android:style/TextAppearance" />
+            style="@android:style/TextAppearance"
+            android:layout_weight="0.58" />
 
         <TextView
             android:layout_width="wrap_content"

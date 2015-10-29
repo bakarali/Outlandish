@@ -28,12 +28,13 @@ html, body {
 // locate you.
  var map;
 //var url = "http://192.168.1.8/current_loc.php?action=get_current_loc&url_code={{url_code}}";
- var url = "http://www.techhunger.com/current_loc.php?action=get_current_loc&url_code={{url_code}}";
+var url = "http://www.techhunger.com/current_loc.php?action=get_current_loc&url_code={{url_code}}";
  //var url = "http://localhost/current_loc.php?action=get_current_loc&url_code={{url_code}}";		
   var infoWindow;
   var directionsDisplay;
   
   var start_pos;
+  var isExpired = {{expire_status}};
   
 function initMap() {
 				  
@@ -84,8 +85,12 @@ map =  new google.maps.Map(document.getElementById("map"), {
       infoWindow.setPosition(start_pos);
       infoWindow.setContent("{{name}} ");
       map.setCenter(start_pos);
-      		
-		cUpdateLocation(infoWindow);	
+      
+      if(isExpired != true){
+		cUpdateLocation(infoWindow);
+      }else{
+    	  alert("Location URL is expired.");
+      }
     
   }
 	var refreshIntervalId;
@@ -133,6 +138,7 @@ function cUpdateLocation(passInfoWindow){
                     dataType: "json",
                     success: function(data) {
                     end_pos;
+                  if(data.response.expire_status!="true"){
 					if(data.response.status==0){
                         var start_location = data.response.current_loc;
                         var end_location = data.response.end_loc;
@@ -166,7 +172,11 @@ function cUpdateLocation(passInfoWindow){
     		  		
 			clearInterval(refreshIntervalId);
       		alert("{{name}} has stopped sharing.");
+	}}else{
+		clearInterval(refreshIntervalId);
+		  alert("Location URL is expired.");
 	}
+                    
                   }
                 });
 				
@@ -179,6 +189,7 @@ function cUpdateLocation(passInfoWindow){
 
 				
     </script>
+   
 	<script
 		src="https://maps.googleapis.com/maps/api/js?signed_in=true&callback=initMap&sensor=false" async defer>
     </script>

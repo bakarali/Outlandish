@@ -9,12 +9,14 @@ class User_start_loc {
 		// $conn->selectDatabase();
 		
 		$current_time = time ();
-		$date = date ( 'm/d/Y h:i:s a', $current_time );
+		$start_time = date ( 'm/d/Y h:i:s a', $current_time );
 		$og_url_code = $current_time . "UID" . $_GET ['uid'];
 		$url_code_md5 = md5 ( $og_url_code );
+		$endTime = strtotime("+24 hours",strtotime($start_time));
+		$url_expire_time = date ( 'm/d/Y h:i:s a', $endTime );
 		
 		$final_end_loc = preg_replace ( '@[^0-9\.\,]+@i', '', $_GET ['end_loc'] );
-		$sql = "INSERT INTO USER_START_LOC VALUES ('usl_id','" . $_GET ['start_loc'] . "','" . $final_end_loc . "','$url_code_md5','" . $_GET ['uid'] . "','$date','$og_url_code',0);";
+		$sql = "INSERT INTO USER_START_LOC VALUES ('usl_id','" . $_GET ['start_loc'] . "','" . $final_end_loc . "','$url_code_md5','" . $_GET ['uid'] . "','$start_time','$og_url_code',0,'$url_expire_time');";
 		
 		$result = mysqli_query ( $conn->connectToDatabase (), $sql );
 		

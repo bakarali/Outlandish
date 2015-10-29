@@ -131,6 +131,7 @@
             android:text="Login"
             android:id="@+id/gotologin"
             android:background="#757575"
+            android:layout_gravity="center_horizontal"
             android:textColor="#FAFAFA" />
 
     </LinearLayout>

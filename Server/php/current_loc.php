@@ -23,14 +23,15 @@ class Current_loc {
 		}
 		$conn->closeConnection ();
 	}
-
-
 	public function get_current_loc() {
 		$conn = new dbConnection ();
+		$expire_time;
 		
+		$expire_status="false";
 		$get_current_loc_sql = "SELECT current_loc FROM CURRENT_LOC WHERE url_code = '" . $_GET ['url_code'] . "' order by clid desc limit 1;";
-		$get_status_sql = "SELECT status,end_loc FROM USER_START_LOC WHERE url_code = '" . $_GET ['url_code'] . "';";
-		
+		$get_status_sql = "SELECT status,end_loc,expire_time FROM USER_START_LOC WHERE url_code = '" . $_GET ['url_code'] . "';";
+		$current_time = time ();
+		$start_time = date ( 'm/d/Y h:i:s a', $current_time );
 		// $sql = 'SELECT * FROM CURRENT_LOC WHERE url_code =' .$_GET ['url_code'].';';
 		
 		$resultStatus = mysqli_query ( $conn->connectToDatabase (), $get_status_sql );
@@ -38,12 +39,22 @@ class Current_loc {
 		// print_r($resultStatus);
 		$rs = mysqli_fetch_assoc ( $resultStatus );
 		
-		if (count ( $rs ) > 0 && $rs ['status'] == 1) {
+		if (count ( $rs ) > 0){
+			if($rs ['status'] == 1) {	
+				$status = 1;	
+			}
+			$expire_time = $rs['expire_time'];
 			
-			$status = 1;
+			if (strtotime($start_time) >= strtotime($expire_time)) {
+				$expire_status = "true";
+			} else {
+				$expire_status = "false";							
+			}
 		}
 		
-
+		
+		
+		
 		$result = mysqli_query ( $conn->connectToDatabase (), $get_current_loc_sql );
 		
 		if (! $result) {
@@ -56,13 +67,15 @@ class Current_loc {
 			if (mysqli_num_rows ( $result ) > 0) {
 				// $r = mysql_fetch_assoc ( $result );
 				$r = mysqli_fetch_assoc ( $result );
+				
 				// save the fetched row and add it to the array.
 				$response = array (
 						'current_loc' => $r ['current_loc'],
-						'end_loc'=>$rs['end_loc'],
-						'status' => $status 
-				)
-				;
+						'end_loc' => $rs ['end_loc'],
+						'status' => $status,
+						'expire_status'=>$expire_status
+						
+				);
 				$json = array (
 						"status" => "OK",
 						"message" => "success",
@@ -84,8 +97,12 @@ class Current_loc {
 		$uid;
 		$name;
 		
-		$user_start_loc_sql = "SELECT start_loc,end_loc,uid FROM USER_START_LOC WHERE url_code = '" . $_GET ['url_code'] . "' LIMIT 1";
 		
+		$expire_time;
+		$user_start_loc_sql = "SELECT start_loc,end_loc,uid,expire_time FROM USER_START_LOC WHERE url_code = '" . $_GET ['url_code'] . "' LIMIT 1";
+		$expire_status;
+		$current_time = time ();
+		$start_time = date ( 'm/d/Y h:i:s a', $current_time );
 		$start_result = mysqli_query ( $conn->connectToDatabase (), $user_start_loc_sql );
 		$user_start_loc;
 		$user_end_loc;
@@ -96,6 +113,8 @@ class Current_loc {
 			$user_start_loc = $r ['start_loc'];
 			$user_end_loc = $r ['end_loc'];
 			$uid = $r ['uid'];
+			$expire_time = $r ['expire_time'];
+			
 			
 			$user_detail_sql = "Select name from USER_INFO where uid='" . $uid . "'";
 			$user_detail_result = mysqli_query ( $conn->connectToDatabase (), $user_detail_sql );
@@ -105,6 +124,15 @@ class Current_loc {
 			} else {
 			}
 		} else {
+		}
+		if (strtotime($start_time) >= strtotime($expire_time)) {
+			$expire_status = "true";
+			//echo $start_time,$expire_time,$expire_status;
+			
+		} else {
+			$expire_status = "false";
+		//	echo $start_time,$expire_time,$expire_status;
+	
 		}
 		
 		$conn->closeConnection ();
@@ -131,11 +159,13 @@ class Current_loc {
 				'start_loc_lng' => $start_loc_lng,
 				'end_loc_lat' => $end_loc_lat,
 				'end_loc_lng' => $end_loc_lng,
-				'url_code' => $_GET ['url_code'] 
+				'url_code' => $_GET ['url_code'],
+				'expire_status'=>$expire_status		
 		)
 		 );
 	}
 }
+
 
 $get = new Current_loc ();
 if ($_GET ['action'] == 'send_current_loc') {

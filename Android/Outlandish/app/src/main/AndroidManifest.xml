@@ -15,7 +15,8 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher2"
+        android:icon="@mipmap/ic_new_launcher"
+        
         android:label="@string/app_name"
         android:theme="@style/MyMaterialTheme" >
 
@@ -31,7 +32,9 @@
 
         <activity
             android:name=".MapsMasterActivity"
-            android:label="@string/title_activity_maps_master" >
+            android:label="@string/title_activity_maps_master"
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -39,11 +42,17 @@
         </activity>
         <activity
             android:name=".SignupActivity"
-            android:label="@string/title_activity_signup" >
+            android:label="@string/title_activity_signup"
+            android:screenOrientation="portrait"
+
+            >
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login" >
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
+
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />

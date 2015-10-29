@@ -57,6 +57,51 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
         );
+//        Button btntst = (Button)findViewById(R.id.test);
+//        btntst.setOnClickListener(
+//                new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//
+//                        pDialog = new ProgressDialog(LoginActivity.this);
+//                        pDialog.setMessage("Please wait...");
+//                        pDialog.setCancelable(false);
+//                        pDialog.show();
+//                        EditText inputMobileNoET =(EditText) findViewById(R.id.phone_no);
+//                        EditText inputPasswordET = (EditText)findViewById(R.id.password);
+//
+//
+//
+//                        String inputMobileNo = inputMobileNoET.getText().toString().trim();
+//                        String inputPassword = inputPasswordET.getText().toString().trim();
+//                       RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
+//                        String url =urlDomain+"/user.php?action=login&mobile_number="+inputMobileNo+"&password="+inputPassword;
+//                        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+//                                new Response.Listener<String>() {
+//                                    @Override
+//                                    public void onResponse(String response) {
+//                                        // Display the first 500 characters of the response string.
+//                                        if (pDialog.isShowing())
+//                                            pDialog.dismiss();
+//                                        Toast.makeText(LoginActivity.this, "its work", Toast.LENGTH_LONG).show();
+//                                    }
+//                                }, new Response.ErrorListener() {
+//
+//
+//                            @Override
+//                            public void onErrorResponse(VolleyError error) {
+//                                if (pDialog.isShowing())
+//                                    pDialog.dismiss();
+//                                Toast.makeText(LoginActivity.this, "its not work", Toast.LENGTH_LONG).show();
+//                            }
+//                        });
+//// Add the request to the RequestQueue.
+//                        queue.add(stringRequest);
+//
+//                    }
+//
+//                }
+//        );
 
         Button btnlogin = (Button)findViewById(R.id.btnlogin);
         btnlogin.setOnClickListener(
@@ -65,11 +110,11 @@ public class LoginActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         String inputMobileNo = inputMobileNoET.getText().toString().trim();
                         String inputPwd = inputPasswordET.getText().toString().trim();
-                        if (inputMobileNo.matches("")||inputPwd.matches("")) {
+                        if (inputMobileNo.matches("") || inputPwd.matches("")) {
                             Toast.makeText(LoginActivity.this, "Enter phone no. and password", Toast.LENGTH_LONG).show();
                         } else {
-                        new dologin().execute();
-}
+                            new dologin().execute();
+                        }
                     }
 
                 }

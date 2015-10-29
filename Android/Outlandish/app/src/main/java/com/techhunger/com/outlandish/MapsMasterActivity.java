@@ -51,7 +51,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
-public class MapsMasterActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
+public class MapsMasterActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 private static final String TAG = "AutoPlace";
 protected GoogleApiClient mGoogleApiClient;
 
@@ -270,6 +270,7 @@ private AutoCompleteTextView mAutocompleteView;
                         Intent homeIntent = new Intent(Intent.ACTION_MAIN);
                         homeIntent.addCategory(Intent.CATEGORY_HOME);
                         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        new StopShareLocation().execute();
                         startActivity(homeIntent);
                     }
                 })
@@ -465,8 +466,8 @@ private AutoCompleteTextView mAutocompleteView;
     private void setUpMap() {
 
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-             mMap.getUiSettings().setMyLocationButtonEnabled(false);
-          //   mMap.setMyLocationEnabled(true);
+
+              mMap.setMyLocationEnabled(true);
 
             Criteria criteria = new Criteria();
             String provider = mLocationManager.getBestProvider(criteria, true);
@@ -494,20 +495,21 @@ private AutoCompleteTextView mAutocompleteView;
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                 btnmylocation = (FloatingActionButton) findViewById(R.id.btnmyLocation);
                 btnmylocation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                      LatLng myCoordinates = new LatLng(latitude, longitude);
-                      CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(myCoordinates, 12);
-                      mMap.animateCamera(yourLocation);
-                      CameraPosition cameraPosition = new CameraPosition.Builder()
-                              .target(myCoordinates)      // Sets the center of the map to LatLng (refer to previous snippet)
-                              .zoom(ZOOM)                   // Sets the zoom
-                              .bearing(90)                // Sets the orientation of the camera to east
-                              .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                              .build();                   // Creates a CameraPosition from the builder
-                      mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                      btnmylocation = (FloatingActionButton) findViewById(R.id.btnmyLocation);
-                }}
+                                                     @Override
+                                                     public void onClick(View v) {
+                                                         LatLng myCoordinates = new LatLng(latitude, longitude);
+                                                         CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(myCoordinates, 12);
+                                                         mMap.animateCamera(yourLocation);
+                                                         CameraPosition cameraPosition = new CameraPosition.Builder()
+                                                                 .target(myCoordinates)      // Sets the center of the map to LatLng (refer to previous snippet)
+                                                                 .zoom(ZOOM)                   // Sets the zoom
+                                                                 .bearing(90)                // Sets the orientation of the camera to east
+                                                                 .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                                                                 .build();                   // Creates a CameraPosition from the builder
+                                                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                                         btnmylocation = (FloatingActionButton) findViewById(R.id.btnmyLocation);
+                                                     }
+                                                 }
 
                 );
 
@@ -877,7 +879,7 @@ private AutoCompleteTextView mAutocompleteView;
             String updateEndLocURL = null;
             if(url_code!=null) {
                 try {
-                    if(clrbtnpress==true) {
+                    if(clrbtnpress) {
                         updateEndLocURL = urlDomain + "/user_start_loc.php?action=updateEndLoc&url_code=" + url_code + "&end_loc=null)";
 
                     }else {
