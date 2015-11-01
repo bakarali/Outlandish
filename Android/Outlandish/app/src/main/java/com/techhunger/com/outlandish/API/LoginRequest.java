@@ -11,22 +11,4 @@ public class LoginRequest extends THRequest {
 
         super(APIConfig.HOST+APIConfig.API_LOGIN.replace("<MOBILE_NO>",mobileNumber).replace("<PASSWORD>",password),LoginResponse.class,null,listener,errorListener);
     }
-
-//    public void doLogin(String url){
-//        THRequest loginReq = new THRequest(url, LoginResponse.class, null, new Response.Listener<LoginResponse>(){
-//            @Override
-//            public void onResponse(LoginResponse login) {
-//                Log.d("Hello","aa");
-//
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError volleyError) {
-//                if(volleyError != null) Log.e("MainActivity", volleyError.getMessage());
-//            }
-//        });
-//
-//        mRequestQueue.add(loginReq);
-//  }
-
 }

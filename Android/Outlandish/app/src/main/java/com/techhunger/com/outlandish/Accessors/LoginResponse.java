@@ -6,13 +6,13 @@ package com.techhunger.com.outlandish.Accessors;
 public class LoginResponse {
    private String status;
    private String message;
-   private Response response;
+   private LoginResponseObj response;
 
-    public Response getResponse() {
+    public LoginResponseObj getResponse() {
         return response;
     }
 
-    public void setReponse(Response response) {
+    public void setReponse(LoginResponseObj response) {
         this.response = response;
     }
 

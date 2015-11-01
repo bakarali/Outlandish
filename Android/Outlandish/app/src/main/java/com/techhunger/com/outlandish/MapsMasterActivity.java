@@ -26,6 +26,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -44,6 +45,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.techhunger.com.outlandish.commonclasses.PlaceAutocompleteAdapter;
 import com.techhunger.com.outlandish.commonclasses.ServiceHandler;
 
+import io.fabric.sdk.android.Fabric;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -96,6 +98,7 @@ private AutoCompleteTextView mAutocompleteView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_maps_master);
       //  android.support.v7.app.ActionBar actionBar =  getSupportActionBar();
         //actionBar.setDisplayShowHomeEnabled(true);
@@ -615,7 +618,7 @@ private AutoCompleteTextView mAutocompleteView;
 
                 String jsonStr = sh.makeServiceCall(url_user_start_loc, ServiceHandler.GET);
 
-                Log.d("Response: ", "> " + jsonStr);
+                Log.d("LoginResponseObj: ", "> " + jsonStr);
 
                 if (jsonStr != null) {
                     try{
@@ -743,7 +746,7 @@ private AutoCompleteTextView mAutocompleteView;
 
             String jsonStr = sh.makeServiceCall(url_current_start_loc, ServiceHandler.GET);
 
-            Log.d("Response: ", "> " + jsonStr);
+            Log.d("LoginResponseObj: ", "> " + jsonStr);
 
             if (jsonStr != null) {
                 try{
