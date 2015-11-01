@@ -2,9 +2,10 @@
 include ('dbConnection.php');
 /**
  */
+ 
 class User_start_loc {
 	public function getUrlSlug() {
-		$conn = new dbConnection ();
+		$connObj = new dbConnection ();
 		
 		// $conn->selectDatabase();
 		
@@ -18,7 +19,7 @@ class User_start_loc {
 		$final_end_loc = preg_replace ( '@[^0-9\.\,]+@i', '', $_GET ['end_loc'] );
 		$sql = "INSERT INTO USER_START_LOC VALUES ('usl_id','" . $_GET ['start_loc'] . "','" . $final_end_loc . "','$url_code_md5','" . $_GET ['uid'] . "','$start_time','$og_url_code',0,'$url_expire_time');";
 		
-		$result = mysqli_query ( $conn->connectToDatabase (), $sql );
+		$result = mysqli_query ( $connObj->connectToDatabase (), $sql );
 		
 		if (! $result) {
 			
@@ -35,12 +36,12 @@ class User_start_loc {
 			echo json_encode ( $json );
 		}
 		
-		$conn->closeConnection ();
+		$connObj->closeConnection ();
 	}
 	function stopShare() {
-		$conn = new dbConnection ();
+		$connObj = new dbConnection ();
 		$sql = "UPDATE USER_START_LOC SET status=1 WHERE url_code='" . $_GET ['url_code'] . "'";
-		$result = mysqli_query ( $conn->connectToDatabase (), $sql );
+		$result = mysqli_query ( $connObj->connectToDatabase (), $sql );
 		
 		if ($result->affected_rows != - 1) {
 			$response = array (
@@ -53,14 +54,14 @@ class User_start_loc {
 					'message' => 'failed' 
 			);
 		}
-		
+		$connObj->closeConnection ();
 		echo json_encode ( $response );
 	}
 	function updateEndLoc() {
-		$conn = new dbConnection ();
+		$connObj = new dbConnection ();
 		$final_end_loc = preg_replace ( '@[^0-9\.\,]+@i', '', $_GET ['end_loc'] );
 		$sql = "UPDATE USER_START_LOC SET end_loc='" . $final_end_loc . "' WHERE url_code='" . $_GET ['url_code'] . "'";
-		$result = mysqli_query ( $conn->connectToDatabase (), $sql );
+		$result = mysqli_query ( $connObj->connectToDatabase (), $sql );
 		
 		if ($result->affected_rows != - 1) {
 			$response = array (
@@ -73,7 +74,7 @@ class User_start_loc {
 					'message' => 'failed' 
 			);
 		}
-		
+		$connObj->closeConnection ();
 		echo json_encode ( $response );
 	}
 }

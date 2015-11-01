@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @author damith
- * @copyright 2011
- */
+
 class dbConnection // create a class for make connection
 {
 	var $host = "localhost";
@@ -11,17 +8,15 @@ class dbConnection // create a class for make connection
 	var $password = "";
 	var $database = "Outlandish";
 	var $myconn;
-	function connectToDatabase() // create a function for connect database
-{
+	public function connectToDatabase() // create a function for connect database
+	{
 		$this->myconn = mysqli_connect ( "localhost", "root", "bak11ali@#", "Outlandish" ) or die ( "Error " . mysqli_error ( $conn ) );
-		
 		return $this->myconn;
 	}
 	
 	
-	function closeConnection() // close the connection
+	public function closeConnection() // close the connection
 	{
-	
 		mysqli_close($this->myconn);
 	}
 	

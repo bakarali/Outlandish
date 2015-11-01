@@ -4,8 +4,8 @@ include ('dbConnection.php');
  */
 class User {
 	public function register() {
-		$conn = new dbConnection ();
-		$conn = $conn->connectToDatabase ();
+		$connObj = new dbConnection();
+		$conn = $connObj->connectToDatabase();
 		$date = date ( 'm/d/Y h:i:s a', time () );
 		// $passwordDecrypt = $_GET ['password'];
 		$passwordDecrypt = sha1 ( $_GET ['password'] );
@@ -47,8 +47,8 @@ class User {
 				);
 				echo json_encode ( $response );
 			}
-			$conn->closeConnection ();
 		}
+		$connObj->closeConnection();
 	}
 	public function login() {
 		

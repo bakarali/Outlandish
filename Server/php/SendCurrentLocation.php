@@ -8,11 +8,10 @@ include('dbConnection.php');
 class CurrentLocation{
 
   public function SendCurrentLocation(){
-    $conn = new dbConnection();
-            $conn->connectToDatabase();
-            echo "<br />";
-            $conn->selectDatabase();
-            echo "<br />";
+    $connObj = new dbConnection();
+            $connObj->connectToDatabase();
+         
+    
 
     $sql = "INSERT INTO SendCurrentLocation VALUES ('".$_GET['scl_id']."','".$_GET['currentlat']."','".$_GET['currentlng']."','".$_GET['url_id']."');";
     $chkinst = mysql_query($sql);
@@ -21,11 +20,11 @@ class CurrentLocation{
   {
   die('Could not enter data: ' . mysql_error());
   echo "<br />";
-  $conn->closeConnection();
+  $connObj->closeConnection();
   }else {
   echo "New record inserted successfully";
   echo "<br />";
-  $conn->closeConnection();
+  $connObj->closeConnection();
 
   }
 

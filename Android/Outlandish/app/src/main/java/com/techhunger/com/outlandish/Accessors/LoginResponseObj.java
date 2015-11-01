@@ -3,7 +3,7 @@ package com.techhunger.com.outlandish.Accessors;
 /**
  * Created by bakar on 31/10/15.
  */
-public class Response{
+public class LoginResponseObj {
 
     public String uid;
     public String name;

@@ -6,13 +6,13 @@ include ('dbConnection.php');
  */
 class Current_loc {
 	public function send_current_loc() {
-		$conn = new dbConnection ();
+		$connObj = new dbConnection ();
 		$date = date ( 'm/d/Y h:i:s a', time () );
 		// $_GET ['url_code'] = "abcurl";
 		$sql = "INSERT INTO CURRENT_LOC VALUES('cl_id','" . $_GET ['current_loc'] . "','" . $_GET ['url_code'] . "','$date');"; // remove usl id while INSERT also delete column from database
 		                                                                                                                        // remove hardcode for url code , get it from url
 		
-		$result = mysqli_query ( $conn->connectToDatabase (), $sql );
+		$result = mysqli_query ( $connObj->connectToDatabase (), $sql );
 		
 		if (! $result) {
 			// die('Could not enter data: ' . mysql_error());
@@ -21,10 +21,10 @@ class Current_loc {
 			
 			echo '{"status":"OK","message":"success"}';
 		}
-		$conn->closeConnection ();
+		$connObj->closeConnection ();
 	}
 	public function get_current_loc() {
-		$conn = new dbConnection ();
+		$connObj = new dbConnection ();
 		$expire_time;
 		
 		$expire_status="false";
@@ -34,7 +34,7 @@ class Current_loc {
 		$start_time = date ( 'm/d/Y h:i:s a', $current_time );
 		// $sql = 'SELECT * FROM CURRENT_LOC WHERE url_code =' .$_GET ['url_code'].';';
 		
-		$resultStatus = mysqli_query ( $conn->connectToDatabase (), $get_status_sql );
+		$resultStatus = mysqli_query ( $connObj->connectToDatabase (), $get_status_sql );
 		$status = 0;
 		// print_r($resultStatus);
 		$rs = mysqli_fetch_assoc ( $resultStatus );
@@ -55,7 +55,7 @@ class Current_loc {
 		
 		
 		
-		$result = mysqli_query ( $conn->connectToDatabase (), $get_current_loc_sql );
+		$result = mysqli_query ( $connObj->connectToDatabase (), $get_current_loc_sql );
 		
 		if (! $result) {
 			// die ( 'Could not enter data: ' . mysql_error () );
@@ -87,12 +87,12 @@ class Current_loc {
 			// $conn->closeConnection ();
 		}
 		
-		$conn->closeConnection ();
+		$connObj->closeConnection ();
 	}
 	
 	// getLocation - It will take last location from user_start_loc url_code
 	function getLocation() {
-		$conn = new dbConnection ();
+		$connObj = new dbConnection ();
 		
 		$uid;
 		$name;
@@ -103,7 +103,7 @@ class Current_loc {
 		$expire_status;
 		$current_time = time ();
 		$start_time = date ( 'm/d/Y h:i:s a', $current_time );
-		$start_result = mysqli_query ( $conn->connectToDatabase (), $user_start_loc_sql );
+		$start_result = mysqli_query ( $connObj->connectToDatabase (), $user_start_loc_sql );
 		$user_start_loc;
 		$user_end_loc;
 		$uid;
@@ -117,7 +117,7 @@ class Current_loc {
 			
 			
 			$user_detail_sql = "Select name from USER_INFO where uid='" . $uid . "'";
-			$user_detail_result = mysqli_query ( $conn->connectToDatabase (), $user_detail_sql );
+			$user_detail_result = mysqli_query ( $connObj->connectToDatabase (), $user_detail_sql );
 			if (mysqli_num_rows ( $user_detail_result )) {
 				$row = mysqli_fetch_assoc ( $user_detail_result );
 				$name = $row ['name'];
@@ -135,7 +135,7 @@ class Current_loc {
 	
 		}
 		
-		$conn->closeConnection ();
+		$connObj->closeConnection ();
 		
 		$start_loc = explode ( ",", $user_start_loc );
 		$start_loc_lat = $start_loc [0];
