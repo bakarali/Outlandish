@@ -20,4 +20,8 @@
     <string name="title_messages">Messages</string>
     <string name="title_friends">Friends</string>
     <string name="title_home">Home</string>
+    <string name="title_activity_update">Update</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_splash">Terminus</string>
 </resources>

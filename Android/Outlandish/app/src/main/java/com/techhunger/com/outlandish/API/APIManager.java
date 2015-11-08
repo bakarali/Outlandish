@@ -5,6 +5,7 @@ import android.content.Context;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.techhunger.com.outlandish.Accessors.ForceUpdateResponse;
 import com.techhunger.com.outlandish.Accessors.LoginResponse;
 import com.techhunger.com.outlandish.Accessors.SignupResponse;
 
@@ -25,4 +26,9 @@ public class APIManager {
     public void doSignUp(Response.Listener<SignupResponse> listener, Response.ErrorListener errorListener,String mobileNumber, String password, String name, String email){
         mRequestQueue.add(new SignupRequest(listener,errorListener,mobileNumber,password, name, email));
     }
+
+    public void doForceUpdateCheck(Response.Listener<ForceUpdateResponse> listener, Response.ErrorListener errorListener){
+        mRequestQueue.add(new ForceUpdateRequest(listener,errorListener));
+    }
+
 }

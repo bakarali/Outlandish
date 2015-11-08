@@ -9,6 +9,8 @@ public class APIConfig {
 
     public static final String API_SIGNUP = "/user.php?action=signup&name=<NAME>&email_id=<EMAIL>&password=<PASSWORD>&mobile_number=<MOBILE_NO>";
 
+    public static final String API_FORCEUPDATE = "/updatechecker.php";
+
 
 }
 

@@ -45,13 +45,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.techhunger.com.outlandish.commonclasses.PlaceAutocompleteAdapter;
 import com.techhunger.com.outlandish.commonclasses.ServiceHandler;
 
-import io.fabric.sdk.android.Fabric;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
+
+import io.fabric.sdk.android.Fabric;
 
 public class MapsMasterActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 private static final String TAG = "AutoPlace";
@@ -65,7 +66,7 @@ private AutoCompleteTextView mAutocompleteView;
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private  static final int ZOOM = 15;
-      // private static final String urlDomain = "192.168.1.8";
+     // private static final String urlDomain = "192.168.1.8";
       private static final String urlDomain = "http://www.techhunger.com";
     //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
 
@@ -931,6 +932,5 @@ private AutoCompleteTextView mAutocompleteView;
         }
 
     }
-
 
 }
