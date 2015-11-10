@@ -160,7 +160,7 @@ function cUpdateLocation(passInfoWindow){
 							 lat:end_lat,
 							 lng:end_lng
 						 }
-						 if(end_location != "" && end_location !='undefined' && end_location !='null'){
+						 if(end_location != "" && end_location !='undefined' && end_location !='null' && end_location !='0'){
 						 	updateDestination(end_pos);
 						 }else{
 							 updateDestination(null); //passing null to validate in respected function

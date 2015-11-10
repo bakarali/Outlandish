@@ -11,6 +11,14 @@ public class APIConfig {
 
     public static final String API_FORCEUPDATE = "/updatechecker.php";
 
+    public static final String API_STOPSHARE = "/user_start_loc.php?action=stop_share_location&url_code=<URL_CODE>";
+
+    public static final String API_STARTSHARE = "/user_start_loc.php?action=share_location&start_loc=<START_LOC>&end_loc=<END_LOC>&uid=<UID>";
+
+    public static final String API_UPDATECURRENTLOC = "/current_loc.php?action=send_current_loc&current_loc=<CURRENT_LOC>&url_code=<URL_CODE>";
+
+    public static final String API_UPDATEENDLOC = "/user_start_loc.php?action=updateEndLoc&url_code=<URL_CODE>&end_loc=<END_LOC>";
+
 
 }
 

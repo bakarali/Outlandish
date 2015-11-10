@@ -11,7 +11,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -26,6 +25,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -42,11 +43,12 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.techhunger.com.outlandish.API.APIManager;
+import com.techhunger.com.outlandish.Accessors.CommonResponse;
+import com.techhunger.com.outlandish.Accessors.StartSharingResponse;
+import com.techhunger.com.outlandish.Accessors.StopShareResponse;
+import com.techhunger.com.outlandish.Utils.AppUtils;
 import com.techhunger.com.outlandish.commonclasses.PlaceAutocompleteAdapter;
-import com.techhunger.com.outlandish.commonclasses.ServiceHandler;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -101,9 +103,6 @@ private AutoCompleteTextView mAutocompleteView;
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_maps_master);
-      //  android.support.v7.app.ActionBar actionBar =  getSupportActionBar();
-        //actionBar.setDisplayShowHomeEnabled(true);
-       // actionBar.setIcon(R.mipmap.ic_launcher4);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(mToolbar);
@@ -177,7 +176,10 @@ private AutoCompleteTextView mAutocompleteView;
                             btnreshare.setVisibility(View.GONE);
                             btnshare.setVisibility(View.VISIBLE);
                             //Toast.makeText(MapsMasterActivity.this, "update location stopped.", Toast.LENGTH_LONG).show();
-                            new StopShareLocation().execute();
+                            //new StopShareLocation().execute();
+                            if(url_code != null) {
+                                doStopShare(url_code);
+                            }
                             chkshared = false;
                             endPointLatLong=null;
 
@@ -197,7 +199,8 @@ private AutoCompleteTextView mAutocompleteView;
                         NetworkInfo netInfo = cm.getActiveNetworkInfo();
                         if (netInfo != null && netInfo.isConnectedOrConnecting()) {
                             if (uid != null) {
-                                new GetUserStartLocation().execute();
+                                //new GetUserStartLocation().execute();
+                                doStartSharing();
                                 chkshared = true;
                             } else {
                                 Intent intent = new Intent(MapsMasterActivity.this, SignupActivity.class);
@@ -234,7 +237,8 @@ private AutoCompleteTextView mAutocompleteView;
                                 chkshared = true;
 
                             } else {
-                                new GetUserStartLocation().execute();
+                               // new GetUserStartLocation().execute();
+                                doStartSharing();
                                 chkshared = true;
                             }
 
@@ -252,11 +256,32 @@ private AutoCompleteTextView mAutocompleteView;
                 }
         );
 
-
-
-
-
 }
+
+    public void doStopShare(String urlCode){
+        APIManager apiManager = new APIManager(getApplicationContext());
+        apiManager.doStopShare(successListener, errorListener, urlCode);
+    }
+
+    Response.Listener<StopShareResponse> successListener = new Response.Listener<StopShareResponse>(){
+
+        @Override
+        public void onResponse(StopShareResponse response) {
+            if(response !=null){
+                if(response.getStatus().equals("OK")){
+                    Toast.makeText(MapsMasterActivity.this,response.getMessage(),Toast.LENGTH_SHORT).show();
+                }else
+                    Toast.makeText(MapsMasterActivity.this, response.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    Response.ErrorListener errorListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Toast.makeText(MapsMasterActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+        }
+    };
 
     @Override
     public void onBackPressed() {
@@ -274,7 +299,9 @@ private AutoCompleteTextView mAutocompleteView;
                         Intent homeIntent = new Intent(Intent.ACTION_MAIN);
                         homeIntent.addCategory(Intent.CATEGORY_HOME);
                         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        new StopShareLocation().execute();
+                        if (url_code != null) {
+                            doStopShare(url_code);
+                        }
                         startActivity(homeIntent);
                     }
                 })
@@ -317,7 +344,8 @@ private AutoCompleteTextView mAutocompleteView;
                 endPointLatLong=null;
                 clrbtnpress = true;
                 if(url_code!=null) {
-                    new updateEndLoc().execute();
+                    //new updateEndLoc().execute();
+                    doUpdateEndLoc();
                 }
             }
         });
@@ -347,6 +375,8 @@ private AutoCompleteTextView mAutocompleteView;
             PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
                     .getPlaceById(mGoogleApiClient, placeId);
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+            clrbtnpress = false;
+            AppUtils.hideSoftKeyboard(MapsMasterActivity.this);
 
 
             Log.i(TAG, "Called getPlaceById to get Place details for " + item.placeId);
@@ -377,7 +407,8 @@ private AutoCompleteTextView mAutocompleteView;
                     .title(place.getName().toString()));
 
             if(chkshared){
-                new updateEndLoc().execute();
+                //new updateEndLoc().execute();
+                doUpdateEndLoc();
 
             }
 
@@ -411,7 +442,8 @@ private AutoCompleteTextView mAutocompleteView;
                 try{
                     //do your code here
 
-                    new UpdateCurrentLocation().execute();
+                  //  new UpdateCurrentLocation().execute();
+                    doUpdateCurrentLoc();
 
 
 
@@ -573,212 +605,95 @@ private AutoCompleteTextView mAutocompleteView;
 
 
 
+    private void doStartSharing(){
+        Location myLocation = getLastKnownLocation();
+        double latitude = myLocation.getLatitude();
+        double longitude = myLocation.getLongitude();
+        finalLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
 
-
-    /**
-     * Async task class to get json by making HTTP call
-     * */
-    private class GetUserStartLocation extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Showing progress dialog
-            pDialog = new ProgressDialog(MapsMasterActivity.this);
-            pDialog.setMessage("Please wait...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-
-        }
-
-
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            // Creating service handler class instance
-            ServiceHandler sh = new ServiceHandler();
-
-            // Making a request to url and getting response
-
-            Location myLocation = getLastKnownLocation();
-            double latitude = myLocation.getLatitude();
-            double longitude = myLocation.getLongitude();
-
-            finalLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
-
-            String url_user_start_loc = null;
+        APIManager apiManager = new APIManager(getApplicationContext());
+        String endLoc = null;
+        if(endPointLatLong != null){
             try {
-                if(endPointLatLong !=null){
-                    url_user_start_loc = urlDomain+"/user_start_loc.php?action=share_location&start_loc="+finalLoc+"&end_loc="+ URLEncoder.encode(endPointLatLong, "utf-8") + "&uid=" + uid;
-                }else{
-                    url_user_start_loc = urlDomain+"/user_start_loc.php?action=share_location&start_loc="+finalLoc+"&end_loc=null&uid="+uid;
-                }
+                endLoc = URLEncoder.encode(endPointLatLong, "utf-8");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
+        }else{
+            endLoc = "0";
+        }
+
+        apiManager.doStartSharing(successStartShareListener, errorListener, finalLoc, endLoc, uid);
+    }
 
 
-                String jsonStr = sh.makeServiceCall(url_user_start_loc, ServiceHandler.GET);
+    Response.Listener<StartSharingResponse> successStartShareListener = new Response.Listener<StartSharingResponse>(){
 
-                Log.d("LoginResponseObj: ", "> " + jsonStr);
+        @Override
+        public void onResponse(StartSharingResponse response) {
+            if(response !=null){
+                if(response.getStatus().equals("OK")){
+                    if(response.getResponse().getUrlCode() != null){
+                        url_code = response.getResponse().getUrlCode();
+                        //storing
+                        SharedPreferences.Editor editor = getSharedPreferences(LOC_PREFS, MODE_PRIVATE).edit();
+                        editor.putString("url_code_from_sp", url_code);
+                        editor.commit();
 
-                if (jsonStr != null) {
-                    try{
-                        JSONObject jobj = new JSONObject(jsonStr);
-                        JSONObject responseObj = jobj.getJSONObject("response");
-                        //JSONObject currentLo = responseObj.getJSONObject("url_code");
-                        url_code  =  responseObj.getString("url_code");
-                    }catch (JSONException e){
-                        e.printStackTrace();
+                        callAsynchronousTask();
+
+                        btnstop = (FloatingActionButton) findViewById(R.id.btnstop);
+                        btnreshare = (FloatingActionButton) findViewById(R.id.btnreshare);
+                        btnshare = (FloatingActionButton) findViewById((R.id.btnshare));
+
+                            sharingIntent.setType("text/plain");
+                            String shareBody = "Check you friend location status here "+urlDomain+"/current_loc.php?action=getLocation&url_code="+url_code;
+                            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Terminus Share Location");
+                            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                            startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                            startActivityForResult(sharingIntent, 0);
+
+                        if (btnstop.getVisibility() == View.GONE && btnreshare.getVisibility() == View.GONE) {
+                            // Either gone or invisible
+                            btnstop.setVisibility(View.VISIBLE);
+                            btnreshare.setVisibility(View.VISIBLE);
+                        }
+
+                        if (btnshare.getVisibility() == View.VISIBLE) {
+                            // Either gone or invisible
+                            btnshare.setVisibility(View.GONE);
+                        }
+
                     }
-                } else {
-                    Log.e("ServiceHandler", "Couldn't get any data from the url");
-                }
-
-
-            return null;
+                }else
+                    Toast.makeText(MapsMasterActivity.this, response.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
+    };
 
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            /**
-             * Updating parsed JSON data into ListView
-             * */
+    private void doUpdateCurrentLoc(){
+        Location myLocation = getLastKnownLocation();
+        double latitude = myLocation.getLatitude();
+        double longitude = myLocation.getLongitude();
+        String currentLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
 
-            if(url_code!=null)
-
-            {
-                //storing
-                SharedPreferences.Editor editor = getSharedPreferences(LOC_PREFS, MODE_PRIVATE).edit();
-                editor.putString("url_code_from_sp", url_code);
-                editor.commit();
-            }
-
-            callAsynchronousTask();
-
-            btnstop = (FloatingActionButton) findViewById(R.id.btnstop);
-            btnreshare = (FloatingActionButton) findViewById(R.id.btnreshare);
-            btnshare = (FloatingActionButton) findViewById((R.id.btnshare));
-            if(url_code != null) {
-                sharingIntent.setType("text/plain");
-                String shareBody = "Check you friend location status here "+urlDomain+"/current_loc.php?action=getLocation&url_code="+url_code;
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Terminus Share Location");
-                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-                startActivity(Intent.createChooser(sharingIntent, "Share via"));
-                startActivityForResult(sharingIntent, 0);
-            }else{
-                Toast.makeText(MapsMasterActivity.this, "Please click on share location again.", Toast.LENGTH_LONG).show();
-            }
-            if (btnstop.getVisibility() == View.GONE && btnreshare.getVisibility() == View.GONE) {
-
-                // Either gone or invisible
-                btnstop.setVisibility(View.VISIBLE);
-                btnreshare.setVisibility(View.VISIBLE);
-            }
-
-            if (btnshare.getVisibility() == View.VISIBLE) {
-                // Either gone or invisible
-                btnshare.setVisibility(View.GONE);
-            }
-
-
-
-
-//            if(url_code != null) {
-//                sharingIntent.setType("text/plain");
-//                String shareBody = "Check you friend location status here"+url_code;
-//                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Outlandish Share Location");
-//                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-//                startActivity(Intent.createChooser(sharingIntent, "Share via"));
-//                startActivityForResult(sharingIntent, 0);
-//            }else{
-//                Toast.makeText(MapsMasterActivity.this, "Please click on share location again.", Toast.LENGTH_LONG).show();
-//            }
-
-            //show stop button
-
-
-
-
-
-//            Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-//                        sendIntent.setData(Uri.parse("sms:"));
-//                      sendIntent.putExtra("sms_body", currentLoc);
-//            startActivity(sendIntent);
-//            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-//            sharingIntent.setType("text/plain");
-//            String shareBody = "Here is the share content body";
-//            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
-//            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-//            startActivity(Intent.createChooser(sharingIntent, "Share via"));
-
-
-        }
+        APIManager apiManager = new APIManager(getApplicationContext());
+        apiManager.doUpdateCurrentLoc(successUpdateCurrentLocListener, errorListener, currentLoc, url_code);
 
     }
 
+    Response.Listener<CommonResponse> successUpdateCurrentLocListener = new Response.Listener<CommonResponse>(){
 
-    private class UpdateCurrentLocation extends AsyncTask<Void, Void, Void> {
-
-        JSONObject jobj = null;
-        String responseStr = null;
         @Override
-        protected Void doInBackground(Void... arg0) {
-
-
-            Location myLocation = getLastKnownLocation();
-
-
-
-
-            double latitude = myLocation.getLatitude();
-            double longitude = myLocation.getLongitude();
-            String finalLoc = String.valueOf(latitude)+","+String.valueOf(longitude);
-
-            // Creating service handler class instance
-            ServiceHandler sh = new ServiceHandler();
-
-            // Making a request to url and getting response
-
-            String url_current_start_loc =  urlDomain+"/current_loc.php?action=send_current_loc&current_loc="+finalLoc+"&url_code="+url_code;
-
-            String jsonStr = sh.makeServiceCall(url_current_start_loc, ServiceHandler.GET);
-
-            Log.d("LoginResponseObj: ", "> " + jsonStr);
-
-            if (jsonStr != null) {
-                try{
-                     jobj = new JSONObject(jsonStr);
-                     responseStr = jobj.getString("status");
-
-
-                }catch (JSONException e){
-                    e.printStackTrace();
+        public void onResponse(CommonResponse response) {
+            if(response !=null){
+                if(response.getStatus().equals("OK")){
+                  //  Toast.makeText(MapsMasterActivity.this,response.getMessage(),Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                Log.e("ServiceHandler", "Couldn't get any data from the url");
             }
-
-            return null;
         }
+    };
 
-
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            if(responseStr.equals("OK")){
-
-               // Toast.makeText(MapsMasterActivity.this, "Saved", Toast.LENGTH_LONG).show();
-            }else{
-              //  Toast.makeText(MapsMasterActivity.this, "Not Saved", Toast.LENGTH_LONG).show();
-            }
-
-        }
-
-    }
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
@@ -792,145 +707,38 @@ private AutoCompleteTextView mAutocompleteView;
     }
 
 
-    /**
-     * Async task class to get json by making HTTP call
-     * */
-    private class StopShareLocation extends AsyncTask<Void, Void, Void> {
-        Boolean isLSStopped = false;
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Showing progress dialog
-            pDialog = new ProgressDialog(MapsMasterActivity.this);
-            pDialog.setMessage("Please wait...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-
-        }
-
-
-        @Override
-        protected Void doInBackground(Void... arg0) {
-
-            // Creating service handler class instance
-            ServiceHandler sh = new ServiceHandler();
-
-            // Making a request to url and getting response
-
-            String url_user_stop_loc = null;
-            if(url_code!=null) {
-                url_user_stop_loc = urlDomain + "/user_start_loc.php?action=stop_share_location&url_code=" + url_code;
-            }
-
-
-            String jsonStr = sh.makeServiceCall(url_user_stop_loc, ServiceHandler.GET);
-
-            if (jsonStr != null) {
-                try{
-                    JSONObject jobj = new JSONObject(jsonStr);
-                   if(jobj.getString("status").equals("OK") && jobj.getString("message").equals("success")){
-                       isLSStopped = true;
-                   }
-                }catch (JSONException e){
-                    e.printStackTrace();
+    private void doUpdateEndLoc() {
+        String endLoc;
+        APIManager apiManager = new APIManager(getApplicationContext());
+        try {
+            if(url_code != null) {
+                if(clrbtnpress) {
+                    endLoc = "0";
+                }else{
+                    endLoc = URLEncoder.encode(endPointLatLong, "utf-8");
                 }
-            } else {
-                Log.e("ServiceHandler", "Couldn't get any data from the url");
+                apiManager.doUpdateEndLoc(successUpdateEndLocListener, errorListener, endLoc, url_code);
             }
-
-            return null;
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
         }
 
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            /**
-             * Updating parsed JSON data into ListView
-             * */
 
-            if(isLSStopped)
-            {
-                Toast.makeText(MapsMasterActivity.this, "Stopped.", Toast.LENGTH_LONG).show();
-            }
-        }
 
     }
-    private class updateEndLoc extends AsyncTask<Void, Void, Void> {
-        Boolean isupadteendloc = false;
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Showing progress dialog
-            pDialog = new ProgressDialog(MapsMasterActivity.this);
-            pDialog.setMessage("Please wait...");
-            pDialog.setCancelable(false);
-            pDialog.show();
 
-        }
 
+    Response.Listener<CommonResponse> successUpdateEndLocListener = new Response.Listener<CommonResponse>(){
 
         @Override
-        protected Void doInBackground(Void... arg0) {
-
-            // Creating service handler class instance
-            ServiceHandler sh = new ServiceHandler();
-
-            // Making a request to url and getting response
-
-            String updateEndLocURL = null;
-            if(url_code!=null) {
-                try {
-                    if(clrbtnpress) {
-                        updateEndLocURL = urlDomain + "/user_start_loc.php?action=updateEndLoc&url_code=" + url_code + "&end_loc=null)";
-
-                    }else {
-                        updateEndLocURL = urlDomain + "/user_start_loc.php?action=updateEndLoc&url_code=" + url_code + "&end_loc=" + URLEncoder.encode(endPointLatLong, "utf-8");
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+        public void onResponse(CommonResponse response) {
+            if(response !=null){
+                if(response.getStatus().equals("OK")){
+                    Toast.makeText(MapsMasterActivity.this, "End Location updated.", Toast.LENGTH_LONG).show();
                 }
             }
-
-
-            String jsonStr = sh.makeServiceCall(updateEndLocURL, ServiceHandler.GET);
-
-            if (jsonStr != null) {
-                try{
-                    JSONObject jobj = new JSONObject(jsonStr);
-                    if(jobj.getString("status").equals("OK") && jobj.getString("message").equals("success")){
-                        isupadteendloc = true;
-                    }
-                }catch (JSONException e){
-                    e.printStackTrace();
-                }
-            } else {
-                Log.e("ServiceHandler", "Couldn't get any data from the url");
-            }
-
-            return null;
         }
+    };
 
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            /**
-             * Updating parsed JSON data into ListView
-             * */
-
-            if(isupadteendloc)
-            {
-                Toast.makeText(MapsMasterActivity.this, "Update end Location.", Toast.LENGTH_LONG).show();
-
-            }
-
-        }
-
-    }
 
 }

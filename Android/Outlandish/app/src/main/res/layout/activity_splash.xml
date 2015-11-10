@@ -14,9 +14,11 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="TERMINUS"
         android:id="@+id/textView4"
+        android:textColor="#FFFFFF"
+        android:textSize="60dp"
+        android:fontFamily="sans-serif-thin"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="200dp"
-        android:textColor="#FFFFFF"
-        android:textSize="50dp" />
+        android:layout_marginTop="147dp" />
+
 </RelativeLayout>
