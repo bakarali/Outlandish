@@ -14,7 +14,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.techhunger.com.outlandish.API.APIManager;
 import com.techhunger.com.outlandish.Accessors.ForceUpdateResponse;
-import com.techhunger.com.outlandish.MapsMasterActivity;
 import com.techhunger.com.outlandish.R;
 import com.techhunger.com.outlandish.UpdateActivity;
 
@@ -57,7 +56,7 @@ public class SplashActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     }else {
-                        Intent intent = new Intent(SplashActivity.this, MapsMasterActivity.class);
+                        Intent intent = new Intent(SplashActivity.this, HomeMapActivity.class);
                         startActivity(intent);
                         finish();
                     }

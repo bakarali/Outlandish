@@ -28,14 +28,14 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".MapsMasterActivity"
-            android:label="@string/title_activity_maps_master"
-            android:screenOrientation="portrait" >
-            <intent-filter>
-              <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+        <!--<activity-->
+            <!--android:name=".MapsMasterActivity"-->
+            <!--android:label="@string/title_activity_maps_master"-->
+            <!--android:screenOrientation="portrait" >-->
+            <!--<intent-filter>-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
         <activity
             android:name=".SignupActivity"
             android:label="@string/title_activity_signup"
@@ -62,6 +62,15 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".Actvities.HomeMapActivity"
+            android:label="@string/title_activity_home_map" >
+
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
     </application>

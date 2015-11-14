@@ -1,7 +1,6 @@
 package com.techhunger.com.outlandish;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -43,12 +42,13 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.techhunger.com.outlandish.API.APIConfig;
 import com.techhunger.com.outlandish.API.APIManager;
 import com.techhunger.com.outlandish.Accessors.CommonResponse;
 import com.techhunger.com.outlandish.Accessors.StartSharingResponse;
 import com.techhunger.com.outlandish.Accessors.StopShareResponse;
+import com.techhunger.com.outlandish.Adaptor.PlaceAutocompleteAdapter;
 import com.techhunger.com.outlandish.Utils.AppUtils;
-import com.techhunger.com.outlandish.commonclasses.PlaceAutocompleteAdapter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -65,12 +65,10 @@ private PlaceAutocompleteAdapter mAdapter;
 private AutoCompleteTextView mAutocompleteView;
     private static final LatLngBounds BOUNDS_GREATER_SYDNEY = new LatLngBounds(
             new LatLng(-34.041458, 150.790100), new LatLng(-33.682247, 151.383362));
-
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private  static final int ZOOM = 15;
-     // private static final String urlDomain = "192.168.1.8";
-      private static final String urlDomain = "http://www.techhunger.com";
-    //private static final String urlDomain = "http://outlandish-01.cloudapp.net";
+
+
 
     Boolean clrbtnpress=false;
     Boolean chkshared = false;
@@ -90,11 +88,9 @@ private AutoCompleteTextView mAutocompleteView;
 
 
     LocationManager mLocationManager;
-    private ProgressDialog pDialog;
     public static final String PREFS_NAME = "UserData";
     public static final String LOC_PREFS = "LocationData";
     Place place;
-    private static final int START_AFTER_SECONDS = 20;
 
 
     Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -124,8 +120,6 @@ private AutoCompleteTextView mAutocompleteView;
         }else {
             //popup box
             Toast.makeText(MapsMasterActivity.this, "Please check your internet connection.", Toast.LENGTH_LONG).show();
-
-
         }
 
 
@@ -136,7 +130,6 @@ private AutoCompleteTextView mAutocompleteView;
         getMenuInflater().inflate(R.menu.menu_mapmaster, menu);
         return true;
 
-
     }
 
     public void logOut(){
@@ -145,7 +138,6 @@ private AutoCompleteTextView mAutocompleteView;
         Intent intent = new Intent(MapsMasterActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
-
 
     }
 
@@ -229,7 +221,7 @@ private AutoCompleteTextView mAutocompleteView;
                             url_code = prefs.getString("url_code_from_sp", null);
                             if (url_code != null) {
                                 sharingIntent.setType("text/plain");
-                                String shareBody = "Check you friend location status here " + urlDomain + "/current_loc.php?action=getLocation&url_code=" + url_code;
+                                String shareBody = "Check you friend location status here " + APIConfig.HOST + "/current_loc.php?action=getLocation&url_code=" + url_code;
                                 sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Terminus Share Location");
                                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
@@ -286,7 +278,6 @@ private AutoCompleteTextView mAutocompleteView;
     @Override
     public void onBackPressed() {
          createDialog();
-
     }
     private void createDialog(){
 
@@ -314,6 +305,8 @@ private AutoCompleteTextView mAutocompleteView;
         alert.show();
 
     }
+
+
     private void autoPlaces(){
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, 0 /* clientId */, this)
@@ -351,8 +344,6 @@ private AutoCompleteTextView mAutocompleteView;
         });
 
     }
-
-
 
 
     private AdapterView.OnItemClickListener mAutocompleteClickListener
@@ -433,21 +424,12 @@ private AutoCompleteTextView mAutocompleteView;
 
     public void callAsynchronousTask() {
 
-
-
          runnable = new Runnable() {
 
             @Override
             public void run() {
                 try{
-                    //do your code here
-
-                  //  new UpdateCurrentLocation().execute();
                     doUpdateCurrentLoc();
-
-
-
-                    //also call the same runnable
                     handler.postDelayed(this, 15000);
 
                 }
@@ -647,7 +629,7 @@ private AutoCompleteTextView mAutocompleteView;
                         btnshare = (FloatingActionButton) findViewById((R.id.btnshare));
 
                             sharingIntent.setType("text/plain");
-                            String shareBody = "Check you friend location status here "+urlDomain+"/current_loc.php?action=getLocation&url_code="+url_code;
+                            String shareBody = "Check you friend location status here "+APIConfig.HOST+"/current_loc.php?action=getLocation&url_code="+url_code;
                             sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Terminus Share Location");
                             sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                             startActivity(Intent.createChooser(sharingIntent, "Share via"));

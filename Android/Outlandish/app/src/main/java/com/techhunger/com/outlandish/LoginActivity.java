@@ -18,6 +18,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.techhunger.com.outlandish.API.APIManager;
 import com.techhunger.com.outlandish.Accessors.LoginResponse;
+import com.techhunger.com.outlandish.Actvities.HomeMapActivity;
 import com.techhunger.com.outlandish.Utils.AppUtils;
 
 public class LoginActivity extends AppCompatActivity {
@@ -99,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
                                 editor.putString("name", responseLogin.getResponse().getName());
                                 editor.putString("uid", responseLogin.getResponse().getUid());
                                 editor.commit();
-                                Intent mapMasterIntent = new Intent(LoginActivity.this, MapsMasterActivity.class);
+                                Intent mapMasterIntent = new Intent(LoginActivity.this, HomeMapActivity.class);
                                 startActivity(mapMasterIntent);
                                 finish();
                             } else {

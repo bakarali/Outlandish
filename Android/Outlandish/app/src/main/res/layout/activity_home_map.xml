@@ -1,0 +1,131 @@
+
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/coordinatorLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FABActivity">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/map_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.techhunger.com.outlandish.Actvities.HomeMapActivity">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        tools:context=".MapsActivity" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+    <RelativeLayout
+        android:id="@+id/llTopCtrl"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="#EEEEEE"  android:focusable="true" android:focusableInTouchMode="true"
+        android:layout_weight="1">
+
+        <AutoCompleteTextView
+            android:id="@+id/autocomplete_places"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F5F5F5"
+            android:drawableLeft="@mipmap/ic_search_gray" android:focusableInTouchMode="true"
+            android:hint="@string/autocomplete_hint"
+            android:inputType="textNoSuggestions"
+            android:nextFocusLeft="@id/autocomplete_places"
+            android:nextFocusUp="@id/autocomplete_places"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:textColor="@android:color/primary_text_light"
+            android:textSize="15sp"
+            android:typeface="normal"
+
+            />
+
+        <Button
+            android:id="@+id/button_clear"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
+            android:layout_marginRight="5dp"
+            android:background="@mipmap/ic_delete"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2">
+
+        </LinearLayout>
+</LinearLayout>
+
+
+
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent" android:orientation="vertical"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="bottom|end"
+        android:id="@+id/linearLayout"
+        android:layout_below="@+id/btnmyLocation">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btnshare"
+            android:layout_width="70dp"
+            android:layout_height="61dp"
+            app:backgroundTint="#00695C"
+            android:src="@mipmap/ic_share"
+            app:fabSize="normal"
+            app:layout_anchor="@id/coordinatorLayout"
+            app:layout_anchorGravity="bottom"
+            app:rippleColor="#80CBC4"
+
+            android:layout_gravity="bottom" android:layout_margin="10dp" />
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btnreshare" android:visibility="gone"
+            android:layout_width="70dp"
+            android:layout_height="61dp"
+            android:src="@mipmap/ic_share"
+            app:fabSize="normal"
+            app:layout_anchor="@id/coordinatorLayout"
+            app:layout_anchorGravity="bottom|right|end"
+            app:backgroundTint="#00695C"
+            app:rippleColor="#80CBC4"
+            android:layout_margin="10dp"
+            android:layout_gravity="right|center_vertical"
+            />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btnstop" android:visibility="gone"
+            android:layout_width="70dp"
+            android:layout_height="61dp"
+            android:src="@mipmap/ic_stop"
+            app:fabSize="normal"
+            app:backgroundTint="#B71C1C"
+            app:layout_anchor="@id/coordinatorLayout"
+            app:layout_anchorGravity="bottom|right|end"
+            app:rippleColor="#F44336"
+            android:layout_margin="10dp"
+            android:layout_gravity="right|center_vertical"
+            />
+        </LinearLayout>
+
+</RelativeLayout>
+
+    </android.support.design.widget.CoordinatorLayout>

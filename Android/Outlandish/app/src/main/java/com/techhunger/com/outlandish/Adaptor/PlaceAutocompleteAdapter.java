@@ -1,4 +1,4 @@
-package com.techhunger.com.outlandish.commonclasses;
+package com.techhunger.com.outlandish.Adaptor;
 
 import android.content.Context;
 import android.util.Log;

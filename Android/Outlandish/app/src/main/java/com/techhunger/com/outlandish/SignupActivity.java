@@ -18,6 +18,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.techhunger.com.outlandish.API.APIManager;
 import com.techhunger.com.outlandish.Accessors.SignupResponse;
+import com.techhunger.com.outlandish.Actvities.HomeMapActivity;
 import com.techhunger.com.outlandish.Utils.AppUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -149,7 +150,7 @@ public class SignupActivity extends AppCompatActivity {
                             editor.putString("name", inputName);
                             editor.putString("uid", responseSignup.getResponse().getUid());
                             editor.commit();
-                            Intent mapMasterIntent =  new Intent(SignupActivity.this, MapsMasterActivity.class);
+                            Intent mapMasterIntent =  new Intent(SignupActivity.this, HomeMapActivity.class);
                             startActivity(mapMasterIntent);
                             finish();
 
